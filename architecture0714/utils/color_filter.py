@@ -18,7 +18,7 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     
     [b,g,r] = img_BGR_spilt
     distance = np.sqrt ( (r-r1)**2+(g-g1)**2+(b-b1)**2 )
-    
+    """
     plt.hist(distance, bins = 10)
     plt.title(filename+' '+state+" histogram") 
     plt.xlabel("value")

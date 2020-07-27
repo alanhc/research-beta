@@ -10,7 +10,7 @@ from utils.color_filter import Euclidean_filter
 from utils.symbolic import symbolic_image
 from utils.connect_compoent import ccl, find_BoundingBox
 
-base = '../new_100_out/'
+base = '../../dataset/fewer_light_100/'
 
 save = True
 
@@ -65,7 +65,7 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+"origin/*")
+    files = glob.glob(base+"origin-small/*")
     for f in sorted(files):
         main(f)
    

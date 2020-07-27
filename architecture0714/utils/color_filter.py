@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 from utils.files import getBaseName, createFolder
 state=''
-save = True
+save =False
 def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_spilt, save_path):
     filename = save_path.split('/')[2]
    
@@ -25,10 +25,10 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     d = (d_max-d_min)
     img_d = ((distance-d_min)/d*255.0).astype('uint8')
     
-    adaptive_mean = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 7,3)
-    adaptive_gaus = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 7,3)
+    #adaptive_mean = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 7,3)
+    #adaptive_gaus = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 7,3)
     
-    t2, otsu = cv2.threshold(img_d, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    #t2, otsu = cv2.threshold(img_d, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     
     if state == 'red':
         threshold=170

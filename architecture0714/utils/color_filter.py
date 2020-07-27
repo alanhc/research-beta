@@ -28,7 +28,7 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     #t2, otsu = cv2.threshold(img_d, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     
     if state == 'red':
-        threshold=170
+        threshold=150
     elif state == 'white':
         threshold=15
     

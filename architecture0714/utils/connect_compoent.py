@@ -30,7 +30,7 @@ def find_BoundingBox(img, img_origin):
         h_max = i[-1]
         w_min = j[0]
         w_max = j[-1]
-        cv2.rectangle(img_origin, (w_min,h_min), (w_max, h_max), (0,0,255), 2)
+        cv2.rectangle(img_origin, (w_min,h_min), (w_max, h_max), (255,0,0), 2)
         
         np.append(boxes, np.array([[w_min,h_min, w_max, h_max]]), axis=0)
         #print(index,boxes[i])

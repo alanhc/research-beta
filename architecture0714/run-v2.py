@@ -11,7 +11,7 @@ from utils.enhancement import Nakagami_image_enhancement, contour_Detection, cli
 from utils.edgeBoxes import Edgeboxes
 
 
-base = '../svm/dataset_100/dataset_100/'
+base = '../../dataset/fewer_light_100/'
 
 save = True
 
@@ -33,8 +33,8 @@ def main(frame_path):
     
     [b,g,r] = cv2.split(img)
     
-    img_red_filted = Euclidean_filter(img, 1,150,0,[255,0,0], [b,g,r], save_path)  #img, percent,up_threshold,lower_threshold color(RGB), save_path
-    img_white_filted = Euclidean_filter(img, 1,255,7, [255,255,255], [b,g,r], save_path)  #img, percent, color(RGB), save_path
+    img_red_filted, idx_red = Euclidean_filter(img, 1,150,0,[255,0,0], [b,g,r], save_path)  #img, percent,up_threshold,lower_threshold color(RGB), save_path
+    img_white_filted,idx_white = Euclidean_filter(img, 1,255,7, [255,255,255], [b,g,r], save_path)  #img, percent, color(RGB), save_path
     
     
     img_red_filted_gray = cv2.cvtColor(img_red_filted, cv2.COLOR_BGR2GRAY)
@@ -118,7 +118,7 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+"origin/*")
+    files = glob.glob(base+"origin-small/*")
     for f in sorted(files):
         main(f)
    

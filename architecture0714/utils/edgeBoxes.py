@@ -1,13 +1,13 @@
 import cv2 
 import numpy as np
-
+# https://docs.opencv.org/master/d4/d0d/group__ximgproc__edgeboxes.html
 model = 'model.yml'
-windows = 30
+
 def Edgeboxes(img_gray, img_origin, color, img_roi_combine):
     
     img_origin = np.copy(img_origin)
     img_gray = np.copy(img_gray)
-    
+    img_roi_combine = np.copy(img_roi_combine)
 
     edge_detection = cv2.ximgproc.createStructuredEdgeDetection(model)
 
@@ -20,8 +20,8 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine):
     orimap = edge_detection.computeOrientation(edges)
     edges = edge_detection.edgesNms(edges, orimap)
     
-    edge_boxes = cv2.ximgproc.createEdgeBoxes()
-    edge_boxes.setMaxBoxes(windows)
+    edge_boxes = cv2.ximgproc.createEdgeBoxes(minBoxArea=10, maxBoxes=50)
+    #edge_boxes.setMaxBoxes(windows)
     
     boxes = edge_boxes.getBoundingBoxes(edges, orimap)
 

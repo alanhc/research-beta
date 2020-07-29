@@ -47,3 +47,9 @@ def clip_center(img, y_up, y_down):
     img_tmp[y_up:y_down,:] = img[y_up:y_down,:]
     
     return img_tmp
+
+def color_intensity_th(img):
+    max_img = np.max(a=img, axis=2)
+    img_c = max_img / 255.0
+    ret , img_threshold = cv2.threshold(img_c, 0.4, 1, cv2.THRESH_TOZERO)
+    return img_threshold*255.0

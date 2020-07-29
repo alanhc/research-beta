@@ -7,7 +7,7 @@ import numpy as np
 ########## Method import ##########
 from utils.files import getBaseName, createFolder
 from utils.color_filter import Euclidean_filter
-from utils.enhancement import Nakagami_image_enhancement, contour_Detection, clip_center
+from utils.enhancement import Nakagami_image_enhancement, contour_Detection, clip_center, color_intensity_th
 from utils.edgeBoxes import Edgeboxes
 
 
@@ -34,6 +34,20 @@ def main(frame_path):
     
     [b,g,r] = cv2.split(img)
     
+    ### center inhancement
+    img_c = color_intensity_th(img)
+    img_nakagami = Nakagami_image_enhancement(img_c/255.0, 3) #gray_img, kernel_size
+    print('nakagemi', img_nakagami.max())
+    ret, img_nakagami_thB = cv2.threshold(img_nakagami, 170, 255, cv2.THRESH_BINARY)
+    
+
+    img_red_filted, idx_red = Euclidean_filter(img=img, color=[255,0,0], img_BGR_spilt=[b,g,r], save_path = save_path, method='v2')  #img, percent,up_threshold,lower_threshold color(RGB), save_path
+    img_white_filted, idx_white = Euclidean_filter(img=img, color=[255,255,255], img_BGR_spilt=[b,g,r], save_path = save_path, method='v2')  #img, percent,up_threshold,lower_threshold color(RGB), save_path
+    
+    ###multiply
+    
+
+    """
     img_red_filted, idx_red = Euclidean_filter(img, 1,150,0,[255,0,0], [b,g,r], save_path, method='v2')  #img, percent,up_threshold,lower_threshold color(RGB), save_path
     img_white_filted,idx_white = Euclidean_filter(img, 1,255,7, [255,255,255], [b,g,r], save_path, method='v2')  #img, percent, color(RGB), save_path
     
@@ -69,17 +83,19 @@ def main(frame_path):
     #print(type(img_red_contour_cliped[0]))
     
     """
+    """
     cv2.imshow("img_red_contour_cliped", img_red_contour_cliped)
     #cv2.imshow("img_white_filted_gray", img_white_filted_gray)
     #cv2.imshow("img_red_nakagami", img_red_nakagami)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     """
+    """
 
     img_roi_combine = np.copy(img)
     img_red_edgeboxes,img_roi_combine = Edgeboxes(img_red_contour, img, [0,255,0], img_roi_combine) #contour, img_origin, box color(BGR)
     img_white_edgeboxes,img_roi_combine = Edgeboxes(img_white_contour, img, [255,0,0], img_red_edgeboxes) #contour, img_origin, box color(BGR)
-    
+    """
    
 
     
@@ -89,6 +105,15 @@ def main(frame_path):
         cv2.imwrite('img/out/'+filename+'/'+filename+'_img_H.png', img_H)
         cv2.imwrite('img/out/'+filename+'/'+filename+'_img_S.png', img_S)
         cv2.imwrite('img/out/'+filename+'/'+filename+'_img_V.png', img_V)
+        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_c.png', img_c)
+        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_filted.png', img_red_filted)
+        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_filted.png', img_white_filted)
+        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_nakagami.png', img_nakagami)
+        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_nakagami_thB.png', img_nakagami_thB)
+        
+        #img_nakagami_thB
+        #img_nakagami
+        """
         cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_filted.png', img_red_filted)
         cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_filted.png', img_white_filted)
 
@@ -112,6 +137,7 @@ def main(frame_path):
 
 
         #cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red.png', r)
+        """
         
 
 

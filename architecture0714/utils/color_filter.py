@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from utils.files import getBaseName, createFolder
 state=''
 save =False
-def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_spilt, save_path):
+def Euclidean_filter(img=None, percent=None,up_threshold=None,lower_threshold=None,  color=None, img_BGR_spilt=None, save_path=None, method=None):
     filename = save_path.split('/')[2]
    
     if color==[255,255,255]:
@@ -26,11 +26,16 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     #adaptive_gaus = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 7,3)
     
     #t2, otsu = cv2.threshold(img_d, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-    
-    if state == 'red':
-        threshold=150
-    elif state == 'white':
-        threshold=15
+    if method == 'v3':
+        if state == 'red':
+            threshold=150
+        elif state == 'white':
+            threshold=15
+    elif method == 'v2':
+        if state == 'red':
+            threshold=170
+        elif state == 'white':
+            threshold=15
     
     
     

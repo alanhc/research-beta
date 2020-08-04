@@ -46,3 +46,27 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
         
        
     return img_filted, idx
+
+def binary_color_filter(img):
+    img = np.copy(img)
+    h,w,c = img.shape
+    
+    
+    colors = [
+        [255,0,0],[0,255,0],[0,0,255],
+        [255,255,0],[255,0,255],[0,255,255]
+    ]
+    mask = np.zeros((h,w))
+    for color in colors:
+        
+        lower_color = np.array(color) 
+        upper_color = np.array(color) 
+        temp = cv2.inRange(img, lower_color, upper_color)
+        #mask = np.bitwise_or( np.array(temp, dtype=np.int32), 
+        #                      np.array(mask, dtype=np.int32)
+        #                    )
+        mask = temp + mask
+        
+    
+    #result = cv2.bitwise_and(img, img, mask = mask) 
+    return mask

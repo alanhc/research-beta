@@ -1,9 +1,10 @@
 import cv2 
 import numpy as np
+from utils.color_filter import  binary_color_filter
 
 model = 'model.yml'
 windows = 30
-def Edgeboxes(img_gray, img_origin, color, img_roi_combine):
+def Edgeboxes(img_gray, img_origin, color, img_roi_combine, state, filename, base):
     
     img_origin = np.copy(img_origin)
     img_gray = np.copy(img_gray)
@@ -20,8 +21,8 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine):
     orimap = edge_detection.computeOrientation(edges)
     edges = edge_detection.edgesNms(edges, orimap)
     
-    edge_boxes = cv2.ximgproc.createEdgeBoxes()
-    edge_boxes.setMaxBoxes(windows)
+    edge_boxes = cv2.ximgproc.createEdgeBoxes(minBoxArea=windows, maxBoxes=100)
+   
     
     boxes = edge_boxes.getBoundingBoxes(edges, orimap)
 
@@ -34,6 +35,9 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine):
             img_origin = cv2.rectangle(img_origin, (x, y), (x+w, y+h), color, 1,cv2.LINE_AA)
             img_roi_combine = cv2.rectangle(img_roi_combine, (x, y), (x+w, y+h), color, 1,cv2.LINE_AA)
 
+            
+            
+            
+            
 
-
-    return img_origin, img_roi_combine
+    return img_origin, img_roi_combine, boxes

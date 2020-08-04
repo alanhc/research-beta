@@ -6,14 +6,18 @@ import numpy as np
 
 ########## Method import ##########
 from utils.files import getBaseName, createFolder
-from utils.color_filter import Euclidean_filter
+from utils.color_filter import Euclidean_filter, binary_color_filter
 from utils.enhancement import Nakagami_image_enhancement, contour_Detection, clip_center
 from utils.edgeBoxes import Edgeboxes
+from utils.fusion import make_feature
+from utils.connect_compoent import *
 
 
-base = '../../dataset/fewer_light_100/'
+base = '../../dataset/dataset_100/'
+dataset = "origin-small/*"
 
 save = True
+state = 'train'
 
 def main(frame_path):
     print(frame_path)
@@ -76,12 +80,30 @@ def main(frame_path):
     """
 
     img_roi_combine = np.copy(img)
-    img_red_edgeboxes,img_roi_combine = Edgeboxes(img_red_contour, img, [0,255,0], img_roi_combine) #contour, img_origin, box color(BGR)
-    img_white_edgeboxes,img_roi_combine = Edgeboxes(img_white_contour, img, [255,0,0], img_red_edgeboxes) #contour, img_origin, box color(BGR)
+    img_red_edgeboxes,img_roi_combine, boxes_red = Edgeboxes(img_red_contour, img, [0,255,0], img_roi_combine, state=state, filename=filename, base=base) #contour, img_origin, box color(BGR)
+    img_white_edgeboxes,img_roi_combine, boxes_white = Edgeboxes(img_white_contour, img, [255,0,0], img_red_edgeboxes, state=state, filename=filename, base=base) #contour, img_origin, box color(BGR)
     
-   
+    
+    ### fusion ###
+    if state == 'train':
 
+        img_ground = cv2.imread(base+"ground_truth/"+filename+'.bmp',1).astype('uint8')
+        img_ground_mask = binary_color_filter(img_ground).astype('uint8')
+        
+        img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
+        
+        features_red, answers_red = make_feature(boxes_red, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
+        features_white, answers_white = make_feature(boxes_white, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
+        
+        features = np.concatenate((features_red, features_white), axis=0)
+        answers = np.concatenate((answers_red, answers_white), axis=0)
+        
+        
+
+        
+    ### report ###
     
+        
 
     if save:
         cv2.imwrite('img/out/'+filename+'/'+filename+'_origin.png', img)
@@ -118,7 +140,7 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+"origin-small/*")
+    files = glob.glob(base+dataset)
     for f in sorted(files):
         main(f)
    

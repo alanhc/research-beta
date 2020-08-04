@@ -8,9 +8,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 
 base = '../../dataset/dataset_100/'
+dataset = "origin-tiny/"
 
-
-all_data = pd.read_csv(base+'data.csv')
+all_data = pd.read_csv(base+dataset+'data.csv')
 print('all_data:',all_data.shape)
 
 all_count = all_data.answers.value_counts().sort_index()

@@ -15,7 +15,7 @@ from utils.connect_compoent import *
 
 
 base = '../../dataset/dataset_100/'
-dataset = "origin-tiny/*"
+dataset = "origin-tiny/"
 
 save = True
 state = 'train'
@@ -143,7 +143,7 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+dataset)
+    files = glob.glob(base+dataset+'*')
     features=[]
     answers=[]
     for f_name in sorted(files):
@@ -155,6 +155,6 @@ if __name__ == '__main__':
         print("It cost %f sec"% (tEnd - tStart))
     data = pd.DataFrame(features, columns=['iou', 'min', 'std', 'y', 'area'])
     data['answers'] = pd.DataFrame(answers)
-    data.to_csv(base+'data.csv')
+    data.to_csv(base+dataset+'data.csv')
 
    

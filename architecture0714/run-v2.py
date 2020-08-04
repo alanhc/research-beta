@@ -3,7 +3,8 @@ import glob
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-
+import pandas as pd
+import time
 ########## Method import ##########
 from utils.files import getBaseName, createFolder
 from utils.color_filter import Euclidean_filter, binary_color_filter
@@ -14,7 +15,7 @@ from utils.connect_compoent import *
 
 
 base = '../../dataset/dataset_100/'
-dataset = "origin-small/*"
+dataset = "origin-tiny/*"
 
 save = True
 state = 'train'
@@ -85,20 +86,22 @@ def main(frame_path):
     
     
     ### fusion ###
-    if state == 'train':
+    
+    
 
-        img_ground = cv2.imread(base+"ground_truth/"+filename+'.bmp',1).astype('uint8')
-        img_ground_mask = binary_color_filter(img_ground).astype('uint8')
+    img_ground = cv2.imread(base+"ground_truth/"+filename+'.bmp',1).astype('uint8')
+    img_ground_mask = binary_color_filter(img_ground).astype('uint8')
+    
+    img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
         
-        img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
+    features_red, answers_red = make_feature(boxes_red, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
+    features_white, answers_white = make_feature(boxes_white, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
         
-        features_red, answers_red = make_feature(boxes_red, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
-        features_white, answers_white = make_feature(boxes_white, img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b)
+    features = features_red + features_white
+    answers = answers_red + answers_white
         
-        features = np.concatenate((features_red, features_white), axis=0)
-        answers = np.concatenate((answers_red, answers_white), axis=0)
-        
-        
+       
+    return features, answers
 
         
     ### report ###
@@ -141,6 +144,17 @@ def main(frame_path):
 
 if __name__ == '__main__':
     files = glob.glob(base+dataset)
-    for f in sorted(files):
-        main(f)
+    features=[]
+    answers=[]
+    for f_name in sorted(files):
+        tStart = time.time()
+        f, a = main(f_name)
+        tEnd = time.time()
+        features = features + f
+        answers = answers + a
+        print("It cost %f sec"% (tEnd - tStart))
+    data = pd.DataFrame(features, columns=['iou', 'min', 'std', 'y', 'area'])
+    data['answers'] = pd.DataFrame(answers)
+    data.to_csv(base+'data.csv')
+
    

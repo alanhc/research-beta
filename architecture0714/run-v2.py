@@ -14,8 +14,8 @@ from utils.fusion import make_feature
 from utils.connect_compoent import *
 
 
-base = '../../dataset/dataset_100/'
-dataset = "origin-tiny/"
+base = '../../dataset/pic_100/'
+dataset = "origin/"
 
 save = True
 state = 'train'
@@ -143,7 +143,7 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+dataset+'*')
+    files = glob.glob(base+dataset+'*.bmp')
     features=[]
     answers=[]
     for f_name in sorted(files):

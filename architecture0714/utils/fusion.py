@@ -39,22 +39,36 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b):
             ### make feature
             if state=='train':
                 answer=""
-                if ct.shape[0]!=1:
-                    l_t = t.tolist()
-                    l_c = ct.tolist()
-                    black_idx = l_t.index([0,0,0])
-                    l_t.pop(black_idx)
-                    l_c.pop(black_idx)
+                l_t = t.tolist()
+                l_c = ct.tolist()
+                if [0,0,0] in l_t:
+                    if ct.shape[0]!=1:
+                        black_idx = l_t.index([0,0,0])
+                        
+                        l_t.pop(black_idx)
+                        l_c.pop(black_idx)
 
+                        max_idx = l_c.index(max(l_c))
+                        max_color = l_t[max_idx]
+                        try:
+                            answer = answer_color.index(max_color)
+                        except:
+                            print('label error')
+                            answer = 5
+                        
+                        t = np.array(t)
+                        ct = np.array(ct)
+                    else:
+                        try:
+                            answer = answer_color.index(t[0].tolist())
+                        except:
+                            print('label error')
+                            answer = 5
+                else:
                     max_idx = l_c.index(max(l_c))
                     max_color = l_t[max_idx]
                     answer = answer_color.index(max_color)
-                    
-                    t = np.array(t)
-                    ct = np.array(ct)
-                else:
-                    answer = answer_color.index(t[0].tolist())
-            
+
             
             features.append(feature)
             answers.append(answer)

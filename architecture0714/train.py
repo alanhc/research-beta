@@ -7,8 +7,8 @@ from joblib import dump, load
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 
-base = '../../dataset/dataset_100/'
-dataset = "origin-tiny/"
+base = '../../dataset/pic_100/'
+dataset = "origin/"
 
 all_data = pd.read_csv(base+dataset+'data.csv')
 print('all_data:',all_data.shape)

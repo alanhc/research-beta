@@ -13,7 +13,7 @@ import shutil
 
 from utils.files import getBaseName, createFolder
 
-base = '../../dataset/pic_100/'
+base = '../../dataset/dataset_100/'
 dataset = "origin/"
 save_path = base+'result_out'
 
@@ -62,7 +62,10 @@ for i in range(merge.shape[0]):
         res = json.loads(position) 
         
         x, y, w, h = res
-       
+        if label_pred in [0,1]:
+            label_pred=0
+        else:    
+            label_pred=1
         color = id_to_color[label_pred]
         #print(color, [x,y,w,h])
         img_fusion = cv2.rectangle(img, (x, y), (x+w, y+h), color,2,cv2.LINE_AA  )

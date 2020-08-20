@@ -63,12 +63,14 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     max_color = l_t[max_idx]
                     answer = answer_color.index(max_color)
                     
+                    
                     if answer in [0,1]:
                         answer = 0
                     elif answer in [2,3]:
                         answer = 1
                     else:
                         answer = -1
+                    
                     """
                     print(answer)
                     cv2.imshow("tmp", tmp)

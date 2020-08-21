@@ -14,7 +14,7 @@ from utils.fusion import make_feature
 from utils.connect_compoent import *
 
 
-base = '../../dataset/dataset_100/'
+base = '../../dataset/pic_100/'
 dataset = "origin/"
 
 save = True

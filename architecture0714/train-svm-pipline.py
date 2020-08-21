@@ -60,42 +60,33 @@ min_samples_leaf = [1, 2, 4]
 bootstrap = [True, False]
 
 
-#steps = [('scaler', StandardScaler()), ('SVM', SVC())]
-#pipeline = Pipeline(steps) 
-steps = [('scaler', StandardScaler()), ('rf', RandomForestClassifier())]
+steps = [('scaler', StandardScaler()), ('SVM', SVC())]
 pipeline = Pipeline(steps) 
+#steps = [('scaler', StandardScaler()), ('rf', RandomForestClassifier())]
+#pipeline = Pipeline(steps) 
 
-parameteres = {'rf__n_estimators': n_estimators,
-               'rf__max_features': max_features,
-               'rf__max_depth': max_depth,
-               'rf__min_samples_split': min_samples_split,
-               'rf__min_samples_leaf': min_samples_leaf,
-               'rf__bootstrap': bootstrap}
+parameteres = {'SVM__kernel':['linear','poly', 'rbf', 'sigmoid'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
+parameteres2 = {'SVM__kernel':['rbf'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
 
 
-n_estimators2 = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 4)]
-max_depth2 = [int(x) for x in np.linspace(10, 110, num = 5)]
-parameteres2 = {'rf__n_estimators': n_estimators2,
-               'rf__max_features': max_features,
-               'rf__max_depth': max_depth2,
-               'rf__min_samples_split': min_samples_split,
-               'rf__min_samples_leaf': min_samples_leaf,
-               'rf__bootstrap': bootstrap}
-parameteres3 = {}
-print(parameteres3)
-rf_random = GridSearchCV(pipeline, param_grid=parameteres3, n_jobs=-1)
+
+svm = GridSearchCV(pipeline, param_grid=parameteres2, n_jobs=-1)
 
 
-rf_random.fit(X_train, y_train)
+svm.fit(X_train, y_train)
 
-print(rf_random.best_params_)
+print(svm.best_params_)
 
-dump(rf_random.best_estimator_, save_path)
+dump(svm.best_estimator_, save_path)
 model = load(save_path)
 
 y_pred = model.predict(X_train)
 
 print(confusion_matrix(y_pred,y_train))
 print(classification_report(y_pred, y_train))
+
+# save
+y_pred = pd.DataFrame({'predict':y_pred})
+y_pred.to_csv(base+dataset+'data-2-test.csv')
 
 #https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74

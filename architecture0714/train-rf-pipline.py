@@ -71,7 +71,18 @@ parameteres = {'rf__n_estimators': n_estimators,
                'rf__min_samples_split': min_samples_split,
                'rf__min_samples_leaf': min_samples_leaf,
                'rf__bootstrap': bootstrap}
-rf_random = GridSearchCV(pipeline, param_grid=parameteres, n_jobs=-1)
+
+
+n_estimators2 = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 4)]
+max_depth2 = [int(x) for x in np.linspace(10, 110, num = 5)]
+parameteres2 = {'rf__n_estimators': n_estimators2,
+               'rf__max_features': max_features,
+               'rf__max_depth': max_depth2,
+               'rf__min_samples_split': min_samples_split,
+               'rf__min_samples_leaf': min_samples_leaf,
+               'rf__bootstrap': bootstrap}
+print(parameteres2)
+rf_random = GridSearchCV(pipeline, param_grid=parameteres2, n_jobs=-1)
 
 
 rf_random.fit(X_train, y_train)

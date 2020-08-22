@@ -183,6 +183,6 @@ if __name__ == '__main__':
             print("It cost %f sec"% (tEnd - tStart))
         data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
         data['answers'] = pd.DataFrame(answers)
-        data.to_csv(base+dataset+'data-2.csv')
+        data.to_csv(base+dataset+'data-3.csv')
 
    

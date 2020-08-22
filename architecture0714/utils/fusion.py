@@ -46,9 +46,11 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                 #print(l_t)
                 #print(l_ct)
                 
+                black_area=0
                 # pop black
                 if [0,0,0] in l_t:
                     black_idx = l_t.index([0,0,0])
+                    black_area = l_ct[black_idx]
                     l_t.pop(black_idx)
                     l_ct.pop(black_idx)
                 if [0,0,255] in l_t:
@@ -63,7 +65,14 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     max_color = l_t[max_idx]
                     answer = answer_color.index(max_color)
                     
-                    
+                    if black_area/l_ct[max_idx] > 10:
+                        answer=-1
+                    """
+                    print('label:',answer,black_area, l_ct[max_idx])
+                    cv2.imshow("tmp", tmp)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+                    """
                     if answer in [0,1]:
                         answer = 0
                     elif answer in [2,3]:
@@ -71,12 +80,9 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     else:
                         answer = -1
                     
-                    """
-                    print(answer)
-                    cv2.imshow("tmp", tmp)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
-                    """
+                    
+                    
+                    
                     #print(max_color)
                 #print('answer:',answer)
 

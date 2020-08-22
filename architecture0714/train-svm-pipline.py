@@ -10,83 +10,71 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 base = '../../dataset/dataset_100/'
-dataset = "origin/"
-save_path = base+dataset+'model-rf-v2.pkl'
-all_data = pd.read_csv(base+dataset+'data-2.csv')
-print('all_data:',all_data.shape)
 
-all_count = all_data.answers.value_counts().sort_index()
-max_count = all_count.max()
-len_data = len(all_count) 
-print(all_count)
+train_dataset = ['dataset_100', 'pic_100']
 
-df_class=[]
-for i in range(len_data):
-    idx=all_count.index[i]
-    print(i)
-    df_class.append(all_data[all_data['answers'] == idx])
+for dataset_name in train_dataset:
+    base = '../../dataset/'+dataset_name+'/'
+    save_path = base+dataset+'model-svm-v2.pkl'
+        
+    all_data = pd.read_csv(base+dataset+'data-2.csv')
+    print('all_data:',all_data.shape)
 
-df_test_over = pd.DataFrame()
-#print('===',all_count[2])
-for i in range(len_data):
-    
-    idx=all_count.index[i]
-    if all_count[idx]!= max_count:
-        df_class_over = df_class[i].sample(max_count, replace=True)
-        df_test_over = pd.concat([df_test_over,df_class_over], axis=0)
-    else:
-        df_test_over = pd.concat([df_test_over,df_class[i]], axis=0)
+    all_count = all_data.answers.value_counts().sort_index()
+    max_count = all_count.max()
+    len_data = len(all_count) 
+    print(all_count)
 
-print(df_test_over.answers.value_counts())
+    df_class=[]
+    for i in range(len_data):
+        idx=all_count.index[i]
+        print(i)
+        df_class.append(all_data[all_data['answers'] == idx])
 
-data = df_test_over
-X_train = data[['iou', 'min', 'std', 'y', 'area']]
-y_train = data['answers']
+    df_test_over = pd.DataFrame()
+    #print('===',all_count[2])
+    for i in range(len_data):
+        
+        idx=all_count.index[i]
+        if all_count[idx]!= max_count:
+            df_class_over = df_class[i].sample(max_count, replace=True)
+            df_test_over = pd.concat([df_test_over,df_class_over], axis=0)
+        else:
+            df_test_over = pd.concat([df_test_over,df_class[i]], axis=0)
 
+    print(df_test_over.answers.value_counts())
 
-
-# Number of trees in random forest
-n_estimators = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)]
-# Number of features to consider at every split
-max_features = ['auto', 'sqrt']
-# Maximum number of levels in tree
-max_depth = [int(x) for x in np.linspace(10, 110, num = 11)]
-max_depth.append(None)
-# Minimum number of samples required to split a node
-min_samples_split = [2, 5, 10]
-# Minimum number of samples required at each leaf node
-min_samples_leaf = [1, 2, 4]
-# Method of selecting samples for training each tree
-bootstrap = [True, False]
-
-
-steps = [('scaler', StandardScaler()), ('SVM', SVC())]
-pipeline = Pipeline(steps) 
-#steps = [('scaler', StandardScaler()), ('rf', RandomForestClassifier())]
-#pipeline = Pipeline(steps) 
-
-parameteres = {'SVM__kernel':['linear','poly', 'rbf', 'sigmoid'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
-parameteres2 = {'SVM__kernel':['rbf'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
+    data = df_test_over
+    X_train = data[['iou', 'min', 'std', 'y', 'area']]
+    y_train = data['answers']
 
 
 
-svm = GridSearchCV(pipeline, param_grid=parameteres2, n_jobs=-1)
+    steps = [('scaler', StandardScaler()), ('SVM', SVC())]
+    pipeline = Pipeline(steps) 
+
+    parameteres = {'SVM__kernel':['linear','poly', 'rbf', 'sigmoid'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
+    parameteres2 = {'SVM__kernel':['rbf'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
 
 
-svm.fit(X_train, y_train)
 
-print(svm.best_params_)
+    svm = GridSearchCV(pipeline, param_grid=parameteres2, n_jobs=-1)
 
-dump(svm.best_estimator_, save_path)
-model = load(save_path)
 
-y_pred = model.predict(X_train)
+    svm.fit(X_train, y_train)
 
-print(confusion_matrix(y_pred,y_train))
-print(classification_report(y_pred, y_train))
+    print(svm.best_params_)
 
-# save
-y_pred = pd.DataFrame({'predict':y_pred})
-y_pred.to_csv(base+dataset+'data-2-test.csv')
+    dump(svm.best_estimator_, save_path)
+    model = load(save_path)
 
-#https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74
+    y_pred = model.predict(X_train)
+
+    print(confusion_matrix(y_pred,y_train))
+    print(classification_report(y_pred, y_train))
+
+    # save
+    y_pred = pd.DataFrame({'predict':y_pred})
+    y_pred.to_csv(base+dataset+'data-2-test.csv')
+
+    #https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74

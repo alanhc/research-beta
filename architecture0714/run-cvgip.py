@@ -13,20 +13,22 @@ from utils.edgeBoxes import Edgeboxes
 from utils.fusion import make_feature
 from utils.connect_compoent import *
 
+train_dataset = ['dataset_100', 'pic_100']
 
-base = '../../dataset/pic_100/'
+#base = '../../dataset/'+train_dataset+'/'
 dataset = "origin/"
 
 save = True
 state = 'train'
 
-def main(frame_path):
+def main(frame_path, dataset_name):
     print(frame_path)
     filename, f_type = getBaseName(frame_path)
     createFolder('img')
     createFolder('img/out')
-    createFolder('img/out/'+filename)
-    save_path = 'img/out/'+filename+'/'
+    createFolder('img/out/'+dataset_name)
+    createFolder('img/out/'+dataset_name+'/'+filename)
+    save_path = 'img/out/'+dataset_name+'/'+filename+'/'
 
     img = cv2.imread(frame_path, 1)
     h, w, c = img.shape
@@ -121,43 +123,43 @@ def main(frame_path):
         
 
     if save:
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_origin.png', img)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_color_intensity_with_threshold.png', img_th*255.0)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_nakagami.png', img_nakagami)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_nakagami_thB.png', img_nakagami_thB*255.0)
+        cv2.imwrite(save_path+'_origin.png', img)
+        cv2.imwrite(save_path+'_color_intensity_with_threshold.png', img_th*255.0)
+        cv2.imwrite(save_path+'_img_nakagami.png', img_nakagami)
+        cv2.imwrite(save_path+'_img_nakagami_thB.png', img_nakagami_thB*255.0)
         
         
         
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_H.png', img_H)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_S.png', img_S)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_V.png', img_V)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_filted.png', img_red_filted)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_filted.png', img_white_filted)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_filted_gray.png', img_red_filted_gray)
+        cv2.imwrite(save_path+'_img_H.png', img_H)
+        cv2.imwrite(save_path+'_img_S.png', img_S)
+        cv2.imwrite(save_path+'_img_V.png', img_V)
+        cv2.imwrite(save_path+'_img_red_filted.png', img_red_filted)
+        cv2.imwrite(save_path+'_img_white_filted.png', img_white_filted)
+        cv2.imwrite(save_path+'_img_red_filted_gray.png', img_red_filted_gray)
         
-        #cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_nakagami.png', img_red_nakagami)
-        #cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_nakagami.png', img_white_nakagami)
+        #cv2.imwrite(save_path+'_img_red_nakagami.png', img_red_nakagami)
+        #cv2.imwrite(save_path+'_img_white_nakagami.png', img_white_nakagami)
         
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_nakagami_cliped.png', img_red_nakagami_cliped)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_nakagami_cliped.png', img_white_nakagami_cliped)
+        cv2.imwrite(save_path+'_img_red_nakagami_cliped.png', img_red_nakagami_cliped)
+        cv2.imwrite(save_path+'_img_white_nakagami_cliped.png', img_white_nakagami_cliped)
 
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_multiply.png', img_red_multiply)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_multiply.png', img_white_multiply)
+        cv2.imwrite(save_path+'_img_red_multiply.png', img_red_multiply)
+        cv2.imwrite(save_path+'_img_white_multiply.png', img_white_multiply)
         
         
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_contour.png', img_red_contour)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_contour.png', img_white_contour)
+        cv2.imwrite(save_path+'_img_red_contour.png', img_red_contour)
+        cv2.imwrite(save_path+'_img_white_contour.png', img_white_contour)
 
         
         
 
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red_edgeboxes.png', img_red_edgeboxes)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_white_edgeboxes.png', img_white_edgeboxes)
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_img_roi_combine.png', img_roi_combine)
+        cv2.imwrite(save_path+'_img_red_edgeboxes.png', img_red_edgeboxes)
+        cv2.imwrite(save_path+'_img_white_edgeboxes.png', img_white_edgeboxes)
+        cv2.imwrite(save_path+'_img_roi_combine.png', img_roi_combine)
 
 
 
-        #cv2.imwrite('img/out/'+filename+'/'+filename+'_img_red.png', r)
+        #cv2.imwrite(save_path+'_img_red.png', r)
     return features, answers
 
         
@@ -167,18 +169,20 @@ def main(frame_path):
     
 
 if __name__ == '__main__':
-    files = glob.glob(base+dataset+'*.bmp')
-    features=[]
-    answers=[]
-    for f_name in sorted(files):
-        tStart = time.time()
-        f, a = main(f_name)
-        tEnd = time.time()
-        features = features + f
-        answers = answers + a
-        print("It cost %f sec"% (tEnd - tStart))
-    data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
-    data['answers'] = pd.DataFrame(answers)
-    data.to_csv(base+dataset+'data-2.csv')
+    for dataset_name in train_dataset:
+        base = '../../dataset/'+dataset_name+'/'
+        files = glob.glob(base+dataset+'*.bmp')
+        features=[]
+        answers=[]
+        for f_name in sorted(files):
+            tStart = time.time()
+            f, a = main(f_name, dataset_name)
+            tEnd = time.time()
+            features = features + f
+            answers = answers + a
+            print("It cost %f sec"% (tEnd - tStart))
+        data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
+        data['answers'] = pd.DataFrame(answers)
+        data.to_csv(base+dataset+'data-2.csv')
 
    

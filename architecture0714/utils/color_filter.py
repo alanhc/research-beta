@@ -5,8 +5,9 @@ from utils.files import getBaseName, createFolder
 state=''
 save =False
 def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_spilt, save_path):
-    filename = save_path.split('/')[2]
-   
+    
+    filename = save_path.split('/')[-2]
+    print(filename)
     if color==[255,255,255]:
         state='white'
     elif color==[255,0,0]:
@@ -34,7 +35,7 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     
     
     
-    print(filename)
+    
 
 
     idx = img_d[:,:] > threshold
@@ -42,7 +43,7 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     img_filted[idx] = 0
 
     if save:
-        cv2.imwrite('img/out/'+filename+'/'+filename+'_'+state+'_img_distance_norm.png', img_d)
+        cv2.imwrite(save_path+'_'+state+'_img_distance_norm.png', img_d)
         
        
     return img_filted, idx

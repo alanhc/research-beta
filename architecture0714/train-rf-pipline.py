@@ -91,13 +91,13 @@ for dataset_name in train_dataset:
     pipeline = Pipeline(steps) 
 
     parameteres3 = {
-        'rf__n_estimators': [50,100,200,500],
+        'rf__n_estimators': [50,100,200],
         'rf__max_features': ['auto', 'sqrt', 'log2'],
-        'rf__max_depth' : [4,8,10,20],
+        'rf__max_depth' : [4,8],
         'rf__criterion' :['gini', 'entropy']
     }
     #print(parameteres3)
-    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5,scoring='f1_micro', n_jobs=-1)
+    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5, n_jobs=-1)
 
 
     rf_random.fit(X_train, y_train)

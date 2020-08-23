@@ -10,14 +10,14 @@ from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 base = '../../dataset/dataset_100/'
-
+dataset = "origin/"
 train_dataset = ['dataset_100', 'pic_100']
 
 for dataset_name in train_dataset:
     base = '../../dataset/'+dataset_name+'/'
-    save_path = base+dataset+'model-svm-v2.pkl'
+    save_path = base+dataset+'model-svm-v5.pkl'
         
-    all_data = pd.read_csv(base+dataset+'data-2.csv')
+    all_data = pd.read_csv(base+dataset+'data-3.csv')
     print('all_data:',all_data.shape)
 
     all_count = all_data.answers.value_counts().sort_index()
@@ -55,10 +55,11 @@ for dataset_name in train_dataset:
 
     parameteres = {'SVM__kernel':['linear','poly', 'rbf', 'sigmoid'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
     parameteres2 = {'SVM__kernel':['rbf'],'SVM__C':[0.001,0.1,10,100,10e5], 'SVM__gamma':[0.1,0.01]}
+    parameteres3 = {'SVM__kernel':['rbf'],'SVM__C':[0.001,1,100,10e5], 'SVM__gamma':[0.1,0.01]}
+    parameteres4 = {}
 
 
-
-    svm = GridSearchCV(pipeline, param_grid=parameteres2, n_jobs=-1)
+    svm = GridSearchCV(pipeline, param_grid=parameteres4, n_jobs=-1)
 
 
     svm.fit(X_train, y_train)
@@ -75,6 +76,6 @@ for dataset_name in train_dataset:
 
     # save
     y_pred = pd.DataFrame({'predict':y_pred})
-    y_pred.to_csv(base+dataset+'data-2-test.csv')
+    y_pred.to_csv(base+dataset+'data-3-test.csv')
 
     #https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74

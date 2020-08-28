@@ -59,7 +59,7 @@ for dataset_name in train_dataset:
     parameteres4 = {}
 
 
-    svm = GridSearchCV(pipeline, param_grid=parameteres4, n_jobs=-1)
+    svm = GridSearchCV(pipeline, param_grid=parameteres3, n_jobs=-1)
 
 
     svm.fit(X_train, y_train)

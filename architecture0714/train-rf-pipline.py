@@ -20,7 +20,7 @@ for dataset_name in train_dataset:
     base = '../../dataset/'+dataset_name+'/'
     save_path = base+dataset+'model-rf-v5.pkl'
 
-    all_data = pd.read_csv(base+dataset+'data-3.csv')
+    all_data = pd.read_csv(base+dataset+'data-5.csv')
     print('all_data:',all_data.shape)
 
     all_count = all_data.answers.value_counts().sort_index()
@@ -97,7 +97,7 @@ for dataset_name in train_dataset:
         'rf__criterion' :['gini', 'entropy']
     }
     #print(parameteres3)
-    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5, n_jobs=-1)
+    rf_random = GridSearchCV(pipeline, param_grid=parameteres2,cv=5, n_jobs=-1)
 
 
     rf_random.fit(X_train, y_train)

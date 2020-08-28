@@ -8,7 +8,7 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine, state, filename, bas
     
     img_origin = np.copy(img_origin)
     img_gray = np.copy(img_gray)
-    
+    img_roi_combine = np.copy(img_roi_combine)
 
     edge_detection = cv2.ximgproc.createStructuredEdgeDetection(model)
 

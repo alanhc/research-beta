@@ -46,12 +46,12 @@ def contour_Detection(img):
     h, w = img.shape
     img_contour = np.zeros((h,w))
     img_contour = cv2.drawContours(img_contour, contours, -1, 255, 1)
-
+    #img_contour = cv2.drawContours(img_contour, contours, contourIdx=-1, color=(255,255,255),thickness=-1)
     return img_contour
 
 def clip_center(img, y_up, y_down):
     
-    img_tmp = np.zeros(img.shape).astype('uint8')
+    img_tmp = np.zeros(img.shape)
     img_tmp[y_up:y_down,:] = img[y_up:y_down,:]
     
     return img_tmp

@@ -15,7 +15,7 @@ from utils.connect_compoent import *
 from utils.symbolic import symbolic_image
 
 train_dataset = ['dataset_100', 'pic_100']
-#train_dataset = ['dataset_100']
+#train_dataset = ['pic_100']
 
 dataset = "origin/"
 
@@ -23,14 +23,34 @@ save = True
 state = 'train'
 nakagami = True
 
+names = [
+            'img', 'img_basic_H', 'img_basic_S', 'img_basic_V', 'img_basic_gray', 
+            'img_light_detection_gray_th', 'img_light_detection_nakagami_norm', 'img_light_detection_nakagami_norm_th',
+
+            'img_color_white_filted', 'img_color_white_filted_gray', 'img_color_white_mor', 'img_color_white_multiply', 
+            'img_color_red_filted', 'img_color_red_filted_gray', 'img_color_red_filted_gray_th', 'img_color_red_mor', 
+            'img_color_red_mor_th', 'img_color_red_multiply', 'img_color_white_b', 'img_color_red_b', 
+            'img_color_white_light', 'img_color_red_light', 'img_color_red_contour', 'img_color_white_contour', 
+            
+            'img_red_edgeboxes', 'img_white_edgeboxes'
+        ]
+
+
+createFolder('img')
+createFolder('img/out')
+for dataset_name in train_dataset:
+    createFolder('img/out/'+dataset_name)
+    for i in range(len(names)):
+            createFolder('img/out/'+dataset_name+'/'+names[i])
+
 def main(frame_path, dataset_name):
+    
     print(frame_path)
     filename, f_type = getBaseName(frame_path)
-    createFolder('img')
-    createFolder('img/out')
-    createFolder('img/out/'+dataset_name)
-    createFolder('img/out/'+dataset_name+'/'+filename)
-    save_path = 'img/out/'+dataset_name+'/'+filename+'/'
+    
+    
+    #createFolder('img/out/'+dataset_name+'/'+filename)
+    #save_path = 'img/out/'+dataset_name+'/'+filename+'/'
 
     img = cv2.imread(frame_path, 1)
     h, w, c = img.shape
@@ -50,9 +70,9 @@ def main(frame_path, dataset_name):
     else:
         img_nakagami = img_gray_th
     img_nakagami_norm = img_nakagami/img_nakagami.max() # resize to [0,1]
-    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 0.5, 1, cv2.THRESH_TOZERO)
+    
+    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 0.92, 1, cv2.THRESH_TOZERO)
     ### clip center
-    print(h/3, h)
     img_nakagami_norm_th = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     #print(img_nakagami_norm_th_center.max())
     #print(img_nakagami_norm_th.max())
@@ -61,11 +81,11 @@ def main(frame_path, dataset_name):
     ret , img_white_filted = cv2.threshold(img_gray, 245/255.0, 1, cv2.THRESH_TOZERO)
     img_white_filted = img_white_filted*255.0
     #img_red_filted, idx_red, img_red_d = Euclidean_filter(img=img, threshold=150, color=[255,50,150], img_BGR_spilt=[b,g,r], save_path=save_path)
-    lower_red = np.array([0,50,127])
-    upper_red = np.array([5,255,255])
+    lower_red = np.array([0,15,200])
+    upper_red = np.array([40,255,255])
     mask0 = cv2.inRange(img_hsv, lower_red, upper_red)
     
-    lower_red = np.array([140,50,127])
+    lower_red = np.array([140,15,200])
     upper_red = np.array([180,255,255])
     mask1 = cv2.inRange(img_hsv, lower_red, upper_red)
     mask = mask0 + mask1
@@ -82,10 +102,10 @@ def main(frame_path, dataset_name):
     
     img_red_filted_gray = cv2.cvtColor(img_red_filted, cv2.COLOR_BGR2GRAY)
     ret , img_red_filted_gray_th = cv2.threshold(img_red_filted_gray, 150, 255, cv2.THRESH_TOZERO)
-    k=np.ones((9,9), np.uint8)
+    k=np.ones((13,13), np.uint8)
     #k=cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(13,13))
     img_red_mor = cv2.morphologyEx(img_red_filted_gray,cv2.MORPH_CLOSE, k,iterations=5)
-    ret, img_red_mor_th = cv2.threshold(img_red_mor, 170, 255, cv2.THRESH_TOZERO)
+    ret, img_red_mor_th = cv2.threshold(img_red_mor, 80, 255, cv2.THRESH_TOZERO)
     
 
     ### Multiply color and light
@@ -125,46 +145,24 @@ def main(frame_path, dataset_name):
     features = features_red + features_white
     answers = answers_red + answers_white
 
-    cv2.imwrite(save_path+'_origin.png', img)
-    cv2.imwrite(save_path+'_img_gray.png', img_gray*255.0)
-    cv2.imwrite(save_path+'_img_hsv_H.png', img_H)
-    cv2.imwrite(save_path+'_img_hsv_S.png', img_S)
-    cv2.imwrite(save_path+'_img_hsv_V.png', img_V)
-
-    cv2.imwrite(save_path+'_img_th.png', img_gray_th*255.0)
-    cv2.imwrite(save_path+'_img_nakagami.png', img_nakagami_norm*255.0)
+    imgs =  [
+            img, img_H, img_S, img_V, img_gray*255.0, 
+            img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0,
+            img_white_filted, img_white_filted_gray, img_white_mor*255.0, img_white_multiply*255.0, 
+            img_red_filted, img_red_filted_gray, img_red_filted_gray_th, img_red_mor, 
+            img_red_mor_th, img_red_multiply, img_white_b, img_red_b, 
+            img_white_light, img_red_light, img_red_contour, img_white_contour, 
+            img_red_edgeboxes, img_white_edgeboxes
+    ]
     
-    
-    cv2.imwrite(save_path+'_img_white_filted.png', img_white_filted)
-    cv2.imwrite(save_path+'_img_white_filted_gray.png', img_white_filted_gray)
-    cv2.imwrite(save_path+'_img_white_mor.png', img_white_mor*255.0)
-    cv2.imwrite(save_path+'_img_white_multiply.png', img_white_multiply*255.0)
-    
-    
-    
-    cv2.imwrite(save_path+'_img_red_filted.png', img_red_filted)
-    cv2.imwrite(save_path+'_img_red_filted_gray.png', img_red_filted_gray)
-    cv2.imwrite(save_path+'_img_red_filted_gray_th.png', img_red_filted_gray_th)
-    cv2.imwrite(save_path+'_img_red_mor.png', img_red_mor)
-    cv2.imwrite(save_path+'_img_red_mor_th.png', img_red_mor_th)
-    cv2.imwrite(save_path+'_img_red_multiply.png', img_red_multiply)
-    #cv2.imwrite(save_path+'_img_red_multiply_dilate.png', img_red_multiply_dilate)
-    
-    
-    cv2.imwrite(save_path+'_img_white_b.png', img_white_b)
-    cv2.imwrite(save_path+'_img_red_b.png', img_red_b)
-    
-    cv2.imwrite(save_path+'_img_white_light.png', img_white_light)
-    cv2.imwrite(save_path+'_img_red_light.png', img_red_light)
-
-    cv2.imwrite(save_path+'_img_red_contour.png', img_red_contour)
-    cv2.imwrite(save_path+'_img_white_contour.png', img_white_contour)
-    
-    cv2.imwrite(save_path+'_img_red_edgeboxes.png', img_red_edgeboxes)
-    cv2.imwrite(save_path+'_img_white_edgeboxes.png', img_white_edgeboxes)
-    cv2.imwrite(save_path+'_img_roi_combine.png', img_roi_combine)
-    cv2.imwrite(save_path+'_img_nakagami_norm_th.png', img_nakagami_norm_th*255.0)
-    
+    for i in range(len(names)):
+        
+        save_path = 'img/out/'+dataset_name+'/'+names[i]+'/'+filename
+        try:
+            cv2.imwrite(save_path+'.png', imgs[i])
+        except:
+            print('error on ', names[i])
+   
     #img_white_edgeboxes,img_roi_combine,
     
     #cv2.imwrite(save_path+'_img_nakagami_thB.png', img_nakagami_thB*255.0)
@@ -354,8 +352,11 @@ def main(frame_path, dataset_name):
 
     
 
+
 if __name__ == '__main__':
+    
     for dataset_name in train_dataset:
+        
         base = '../../dataset/'+dataset_name+'/'
         files = glob.glob(base+dataset+'*.bmp')
         features=[]

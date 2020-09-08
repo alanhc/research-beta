@@ -97,7 +97,7 @@ for dataset_name in train_dataset:
         'rf__criterion' :['gini', 'entropy']
     }
     #print(parameteres3)
-    rf_random = GridSearchCV(pipeline, param_grid=parameteres2,cv=5, n_jobs=-1)
+    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5, n_jobs=-1)
 
 
     rf_random.fit(X_train, y_train)

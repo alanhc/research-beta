@@ -7,9 +7,9 @@ dataset_100
 pic_100
 """
 
-base = '../../dataset/pic_100/'
+base = '../../dataset/dataset_100/'
 dataset = "origin/"
-model_path = '../../dataset/dataset_100/'+dataset+'model-rf-v5.pkl'
+model_path = '../../dataset/pic_100/'+dataset+'model-svm-v5.pkl'
 all_data = pd.read_csv(base+dataset+'data-5.csv')
 X_test = all_data[['iou', 'min', 'std', 'y', 'area']]
 y_test = all_data['answers']

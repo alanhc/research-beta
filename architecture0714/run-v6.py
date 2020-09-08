@@ -54,15 +54,9 @@ def main(frame_path, dataset_name):
     h, w, c = img.shape
     [b,g,r] = cv2.split(img)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-    img_hsv[:,:,0] = img_hsv[:,:,0] / img_hsv[:,:,0].max() * 255.0
-    img_hsv[:,:,0] = img_hsv[:,:,1] / img_hsv[:,:,1].max() * 255.0
-    img_hsv[:,:,0] = img_hsv[:,:,2] / img_hsv[:,:,2].max() * 255.0
-
     img_H = img_hsv[:,:,0]
     img_S = img_hsv[:,:,1]
     img_V = img_hsv[:,:,2]
-    
     
     ### Light Detection
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) / 255.0
@@ -79,19 +73,22 @@ def main(frame_path, dataset_name):
 
     ### Area filter
     thresh = (img_nakagami_norm_th * 255.0).astype('uint8')
-    
+    #kernel = np.ones((5,5),np.uint8)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3))
+    img_dilation = cv2.dilate(thresh,kernel,iterations = 3)
+
     img_ccl_origin, img_ccl_show, label_nums = ccl(thresh)    ### need imwrite
     
     
-    """
+    
     cv2.imshow("thresh", thresh)
-    cv2.imshow("opening", img_ccl_show)
+    cv2.imshow("img_dilation", img_dilation)
     #cv2.imshow("sure_bg", sure_bg)
     
     
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    """
+    
     """
     for (i, label) in enumerate(np.unique(img_ccl_origin)):
         if label == 0: #background
@@ -113,28 +110,16 @@ def main(frame_path, dataset_name):
     ret , img_white_filted = cv2.threshold(img_gray, 245/255.0, 1, cv2.THRESH_TOZERO)
     img_white_filted = img_white_filted*255.0
     #img_red_filted, idx_red, img_red_d = Euclidean_filter(img=img, threshold=150, color=[255,50,150], img_BGR_spilt=[b,g,r], save_path=save_path)
-    
-
-
-    lower_red = np.array([0,100,0])
-    upper_red = np.array([5,255,255])
+    lower_red = np.array([0,100,200])
+    upper_red = np.array([40,255,255])
     mask0 = cv2.inRange(img_hsv, lower_red, upper_red)
     
-    lower_red = np.array([170,100,0])
-    upper_red = np.array([179,255,255])
+    lower_red = np.array([140,100,200])
+    upper_red = np.array([180,255,255])
     mask1 = cv2.inRange(img_hsv, lower_red, upper_red)
     mask = mask0 + mask1
     img_red_filted = img.copy()
     img_red_filted[np.where(mask==0)] = 0
-    
-    """
-    cv2.imshow("mask0", mask0)
-    cv2.imshow("mask1", mask1)
-    cv2.imshow("mask", mask)
-    #cv2.imshow("sure_bg", sure_bg)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    """
 
     ###### 形態學操作
     #img_white_filted_gray = cv2.cvtColor(img_white_filted, cv2.COLOR_BGR2GRAY)

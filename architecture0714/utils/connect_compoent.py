@@ -3,7 +3,7 @@ import cv2
 
 def ccl(img):
     num_labels, labels_im = cv2.connectedComponents(img)
-    img_origin = np.copy(labels_im)
+    img_ccl_origin = np.copy(labels_im)
     label_hue = np.uint8(179*labels_im/np.max(labels_im))
     blank_ch = 255*np.ones_like(label_hue)
     label_hue = np.uint8(179*labels_im/np.max(labels_im))
@@ -13,7 +13,7 @@ def ccl(img):
         # set bg label to black
     labeled_img[label_hue==0] = 0
 
-    return img_origin,labeled_img,num_labels
+    return img_ccl_origin,labeled_img,num_labels
 
 def find_BoundingBox(img, img_origin, max_boxes=100, min_area=100):
     img_origin = np.copy(img_origin)

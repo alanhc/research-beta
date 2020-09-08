@@ -25,17 +25,25 @@ nakagami = True
 
 names = [
             'img', 'img_basic_H', 'img_basic_S', 'img_basic_V', 'img_basic_gray', 
-            'img_light_detection_gray_th', 'img_light_detection_nakagami_norm', 'img_light_detection_nakagami_norm_th',
+            'img_light_detection_gray_th', 'img_light_detection_nakagami_norm', 'img_light_detection_nakagami_norm_th','img_light_detection_nakagami_norm_th_clip',
 
             'img_color_white_filted', 'img_color_white_filted_gray', 'img_color_white_mor', 'img_color_white_multiply', 
             'img_color_red_filted', 'img_color_red_filted_gray', 'img_color_red_filted_gray_th', 'img_color_red_mor', 
             'img_color_red_mor_th', 'img_color_red_multiply', 'img_color_white_b', 'img_color_red_b', 
             'img_color_white_light', 'img_color_red_light', 'img_color_red_contour', 'img_color_white_contour', 
-            
             'img_red_edgeboxes', 'img_white_edgeboxes'
         ]
-
-
+"""
+imgs =  [
+            img, img_H, img_S, img_V, img_gray*255.0, 
+            img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0, img_nakagami_norm_th_clip*255.0,
+            img_white_filted, img_white_filted_gray, img_white_mor*255.0, img_white_multiply*255.0, 
+            img_red_filted, img_red_filted_gray, img_red_filted_gray_th, img_red_mor, 
+            img_red_mor_th, img_red_multiply, img_white_b, img_red_b, 
+            img_white_light, img_red_light, img_red_contour, img_white_contour, 
+            img_red_edgeboxes, img_white_edgeboxes
+    ]
+"""
 createFolder('img')
 createFolder('img/out')
 for dataset_name in train_dataset:
@@ -66,14 +74,42 @@ def main(frame_path, dataset_name):
     
 
     if nakagami:
-        img_nakagami = Nakagami_image_enhancement(img_gray_th, 5)
+        img_nakagami = Nakagami_image_enhancement(img_gray_th, 3)
     else:
         img_nakagami = img_gray_th
     img_nakagami_norm = img_nakagami/img_nakagami.max() # resize to [0,1]
     
-    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 0.92, 1, cv2.THRESH_TOZERO)
+    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 0.88, 1, cv2.THRESH_TOZERO)
+
+    ### Area filter
+    thresh = (img_nakagami_norm_th * 255.0).astype('uint8')
+    
+    img_ccl_origin, img_ccl_show, label_nums = ccl(thresh)    ### need imwrite
+    
+    
+    """
+    cv2.imshow("thresh", thresh)
+    cv2.imshow("opening", img_ccl_show)
+    #cv2.imshow("sure_bg", sure_bg)
+    
+    
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    """
+    """
+    for (i, label) in enumerate(np.unique(img_ccl_origin)):
+        if label == 0: #background
+            continue
+        else:
+            labelMask = np.zeros(img_nakagami_norm_th_tmp.shape, dtype="uint8")
+            labelMask[labels == label] = 255
+            numPixels = cv2.countNonZero(labelMask)
+    """
+
+    
+
     ### clip center
-    img_nakagami_norm_th = clip_center(img_nakagami_norm_th, int(h/3), int(h))
+    img_nakagami_norm_th_clip = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     #print(img_nakagami_norm_th_center.max())
     #print(img_nakagami_norm_th.max())
     ### Color filter
@@ -109,8 +145,8 @@ def main(frame_path, dataset_name):
     
 
     ### Multiply color and light
-    img_white_multiply = img_nakagami_norm_th * img_white_mor
-    img_red_multiply = img_nakagami_norm_th * img_red_mor_th
+    img_white_multiply = img_nakagami_norm_th_clip * img_white_mor
+    img_red_multiply = img_nakagami_norm_th_clip * img_red_mor_th
     
     ret, img_white_b = cv2.threshold(img_white_multiply, 0.5, 255, cv2.THRESH_BINARY)
     ret, img_red_b = cv2.threshold(img_red_multiply, 0.5, 255, cv2.THRESH_BINARY)
@@ -147,7 +183,7 @@ def main(frame_path, dataset_name):
 
     imgs =  [
             img, img_H, img_S, img_V, img_gray*255.0, 
-            img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0,
+            img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0, img_nakagami_norm_th_clip*255.0,
             img_white_filted, img_white_filted_gray, img_white_mor*255.0, img_white_multiply*255.0, 
             img_red_filted, img_red_filted_gray, img_red_filted_gray_th, img_red_mor, 
             img_red_mor_th, img_red_multiply, img_white_b, img_red_b, 

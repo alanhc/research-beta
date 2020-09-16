@@ -3,7 +3,7 @@ import numpy as np
 from utils.color_filter import binary_color_filter
 
 
-def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, filename):
+def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, filename, version=None):
     answer_color = [
                     [255,0,0],[0,255,0],   #0 1 
                     [0,255,255],[255,0,255], # 2 3
@@ -73,13 +73,19 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     cv2.waitKey(0)
                     cv2.destroyAllWindows()
                     """
+    
                     if answer in [0,1]:
                         answer = 0
                     elif answer in [2,3]:
                         answer = 1
                     else:
                         answer = -1
-                    
+                if version=='v6':
+                    if answer in [0,1,2,3]:
+                        answer = 0
+                    else:
+                        answer=1
+                      
                     
                     
                     

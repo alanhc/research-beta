@@ -15,9 +15,9 @@ train_dataset = ['dataset_100', 'pic_100']
 
 for dataset_name in train_dataset:
     base = '../../dataset/'+dataset_name+'/'
-    save_path = base+dataset+'model-svm-v5.pkl'
+    save_path = base+dataset+'model-svm-v6.pkl'
         
-    all_data = pd.read_csv(base+dataset+'data-3.csv')
+    all_data = pd.read_csv(base+dataset+'data-6.csv')
     print('all_data:',all_data.shape)
 
     all_count = all_data.answers.value_counts().sort_index()

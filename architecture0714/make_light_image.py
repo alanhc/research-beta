@@ -11,8 +11,8 @@ for dataset_name in train_dataset:
     save_path = 'img/out/'+dataset_name+'/result_light_spot_image/'
     createFolder('img/out/'+dataset_name+'/result_light_spot_image')
 
-    data = pd.read_csv(base+dataset+'data-5.csv')
-    test_data = pd.read_csv(base+dataset+'data-5-test.csv')
+    data = pd.read_csv(base+dataset+'data-6.csv')
+    test_data = pd.read_csv(base+dataset+'data-6-test.csv')
 
     print(data.shape)
     print(test_data.shape)

@@ -59,7 +59,7 @@ for dataset_name in train_dataset:
     parameteres4 = {}
 
 
-    svm = GridSearchCV(pipeline, param_grid=parameteres3, n_jobs=-1)
+    svm = GridSearchCV(pipeline, param_grid=parameteres, n_jobs=-1)
 
 
     svm.fit(X_train, y_train)
@@ -75,7 +75,7 @@ for dataset_name in train_dataset:
     print(classification_report(y_pred, y_train))
 
     # save
-    y_pred = pd.DataFrame({'predict':y_pred})
-    y_pred.to_csv(base+dataset+'data-3-test.csv')
+    #y_pred = pd.DataFrame({'predict':y_pred})
+    #y_pred.to_csv(base+dataset+'data-5-test.csv')
 
     #https://towardsdatascience.com/hyperparameter-tuning-the-random-forest-in-python-using-scikit-learn-28d2aa77dd74

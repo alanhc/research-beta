@@ -15,10 +15,10 @@ from utils.fusion import make_feature
 from utils.connect_compoent import *
 from utils.symbolic import symbolic_image
 
-train_dataset = ['fewer_light_100', 'pic_100']
-#train_dataset = ['pic_100']
+#train_dataset = ['fewer_light_100', 'pic_100']
+train_dataset = ['dataset_100', 'pic_100']
 
-dataset = "origin/"
+dataset = "origin-small/"
 
 save = True
 state = 'train'
@@ -199,17 +199,23 @@ if __name__ == '__main__':
         
         base = '../../dataset/'+dataset_name+'/'
         files = glob.glob(base+dataset+'*.bmp')
+        print(len(files))
         features=[]
         answers=[]
+        i=1
         for f_name in sorted(files):
             tStart = time.time()
             f, a = main(f_name, dataset_name)
             tEnd = time.time()
+
             print("It cost %f sec"% (tEnd - tStart))
+            print("remain:",(len(files)-i)*(tEnd - tStart), "sec")
             features = features + f
             answers = answers + a
+            i+=1
+
         data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
         data['answers'] = pd.DataFrame(answers)
-        data.to_csv(base+dataset+'data-6.csv')
+        data.to_csv(base+dataset+'data-7-test-'+dataset.split('/')[0]+'.csv')
         
    

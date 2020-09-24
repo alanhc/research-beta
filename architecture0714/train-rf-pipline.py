@@ -12,8 +12,8 @@ import numpy as np
 
 dataset = "origin/"
 
-train_dataset = ['dataset_100', 'pic_100']
-
+#train_dataset = ['dataset_100', 'pic_100']
+train_dataset = ['pic_100', 'dataset_100']
 
 
 for dataset_name in train_dataset:

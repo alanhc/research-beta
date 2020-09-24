@@ -17,7 +17,7 @@ from utils.symbolic import symbolic_image
 
 #train_dataset = ['fewer_light_100', 'pic_100']
 train_dataset = ['dataset_100', 'pic_100']
-
+#dataset = "origin/"
 dataset = "origin-small/"
 
 save = True
@@ -92,26 +92,7 @@ def main(frame_path, dataset_name):
     ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 200/255, 1, cv2.THRESH_TOZERO)
     
 
-    """
-    tmp = img_nakagami_norm *255.0
-    tmp = tmp.astype('uint8') 
-    
-    
-    #ret3,img_nakagami_norm_adaptive = cv2.threshold(tmp,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    #print(img_nakagami_norm_adaptive.max())
-    #ret2,img_nakagami_norm_adaptive = cv2.threshold(tmp,230,240,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    createFolder('img/out/'+dataset_name+'/'+"img__adaptive")
-    cv2.imwrite('img/out/'+dataset_name+'/'+"img__adaptive"+'/'+filename+'.png', img_nakagami_norm_adaptive)
-    """
-    
-    
-    
-    """
-    cv2.imshow("thresh", thresh)
-    cv2.imshow("img_dilation", img_dilation)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    """
+   
     
 
     ### clip center

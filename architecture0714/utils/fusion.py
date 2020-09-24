@@ -65,14 +65,10 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     max_color = l_t[max_idx]
                     answer = answer_color.index(max_color)
                     
-                    if black_area/l_ct[max_idx] > 10:
-                        answer=-1
-                    """
-                    print('label:',answer,black_area, l_ct[max_idx])
-                    cv2.imshow("tmp", tmp)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
-                    """
+                    #if black_area/l_ct[max_idx] > 10:
+                    #    answer=-1
+                    
+                    
     
                     if answer in [0,1]:
                         answer = 0
@@ -82,9 +78,17 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                         answer = -1
                 if version=='v6':
                     if answer in [0,1,2,3]:
-                        answer = 0
+                        answer = 1
                     else:
-                        answer=1
+                        answer=0
+
+                    """
+                    #print('label:',answer,black_area, l_ct[max_idx])
+                    print('answer',answer)
+                    cv2.imshow("tmp", tmp)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
+                    """
                       
                     
                     

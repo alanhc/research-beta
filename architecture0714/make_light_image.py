@@ -7,7 +7,7 @@ from utils.files import getBaseName, createFolder
 import json
 
 yolo_path = '/home/alanhc-school/yolo/darkflow/'
-train_dataset = ['fewer_light_100', 'pic_100']
+train_dataset = ['dataset_100', 'pic_100']
 for dataset_name in train_dataset:
     base = '../../dataset/'+dataset_name+'/'
     dataset = "origin/"

@@ -20,7 +20,7 @@ from utils.train_model import *
 #train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
 train_dataset = ['dataset_100', 'pic_100']
 
-dataset = "origin/"
+#dataset = "origin/"
 dataset = "origin-small/"
 
 

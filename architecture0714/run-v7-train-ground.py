@@ -21,7 +21,7 @@ from utils.train_model import *
 train_dataset = ['dataset_100', 'pic_100']
 
 #dataset = "origin/"
-dataset = "origin-small/"
+dataset = "origin/"
 
 
 def make_training_data(base, frame_path, dataset_name):
@@ -119,6 +119,7 @@ if __name__ == '__main__':
         features=[]
         answers=[]
         ### make training data
+        i=1
         for f_name in sorted(files):
             tStart = time.time()
             f, a = make_training_data(base, f_name, dataset_name)
@@ -127,6 +128,8 @@ if __name__ == '__main__':
             answers.extend(a)
             
             print("It cost %f sec"% (tEnd - tStart))
+            print("remain:",(len(files)-i)*(tEnd - tStart), "sec")
+            i+=1
         
         data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
         data['answers'] = pd.DataFrame(answers)
@@ -168,6 +171,6 @@ if __name__ == '__main__':
         print("=====Training models=====")
         save_path = base+dataset+'data-7-train-'+dataset.split('/')[0]
         rf(X_train=X_train, y_train=y_train, save_path=save_path+'-model-rf.pkl' )
-        svm(X_train=X_train, y_train=y_train, save_path=save_path+'-model-svm.pkl' )
+        #svm(X_train=X_train, y_train=y_train, save_path=save_path+'-model-svm.pkl' )
          
        

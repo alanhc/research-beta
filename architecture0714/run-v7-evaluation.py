@@ -27,13 +27,15 @@ for model_dataset in train_dataset:
             
             test_path = test_base+dataset+'data-7-test-'+dataset.split('/')[0]
             
+            
             test_data = pd.read_csv(test_base+dataset+'data-7-test-'+dataset.split('/')[0]+'.csv')
+
             print(test_data.shape)
             X_test = test_data[['iou', 'min', 'std', 'y', 'area']]
             y_test = test_data['answers']
-            
+            y_pred = []
 
-            for model_name in ['svm', 'rf']:
+            for model_name in [ 'rf']:
                 model_path = model_base+dataset+'data-7-train-'+dataset.split('/')[0]+'-model-'+model_name+'.pkl'
                 model = load(model_path)
                 print(model_path,test_base+dataset+'data-7-train-'+dataset.split('/')[0]+'.csv' )
@@ -43,6 +45,9 @@ for model_dataset in train_dataset:
 
                 print(confusion_matrix(y_pred,y_test))
                 print(classification_report(y_pred, y_test))
+                text_file = open(test_path+"-result.txt", "w+")
+                text_file.write(str(confusion_matrix(y_pred,y_test))+'\n'+classification_report(y_pred, y_test))
+                text_file.close()
                 y_pred = pd.DataFrame({'predict':y_pred})
                 y_pred.to_csv(test_path+'-predict.csv')
 

@@ -35,7 +35,7 @@ for model_dataset in train_dataset:
             y_test = test_data['answers']
             y_pred = []
 
-            for model_name in [ 'rf']:
+            for model_name in [ 'rf', 'svm']:
                 model_path = model_base+dataset+'data-7-train-'+dataset.split('/')[0]+'-model-'+model_name+'.pkl'
                 model = load(model_path)
                 print(model_path,test_base+dataset+'data-7-train-'+dataset.split('/')[0]+'.csv' )
@@ -45,7 +45,7 @@ for model_dataset in train_dataset:
 
                 print(confusion_matrix(y_pred,y_test))
                 print(classification_report(y_pred, y_test))
-                text_file = open(test_path+"-result.txt", "w+")
+                text_file = open(test_path+"-result-model-"+model_dataset+".txt", "w+")
                 text_file.write(str(confusion_matrix(y_pred,y_test))+'\n'+classification_report(y_pred, y_test))
                 text_file.close()
                 y_pred = pd.DataFrame({'predict':y_pred})

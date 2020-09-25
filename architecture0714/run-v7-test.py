@@ -17,8 +17,8 @@ from utils.symbolic import symbolic_image
 
 #train_dataset = ['fewer_light_100', 'pic_100']
 train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
-#dataset = "origin/"
-dataset = "origin-small/"
+dataset = "origin/"
+#dataset = "origin-small/"
 
 save = True
 state = 'train'

@@ -16,7 +16,7 @@ from utils.connect_compoent import *
 from utils.symbolic import symbolic_image
 
 #train_dataset = ['fewer_light_100', 'pic_100']
-train_dataset = ['dataset_100', 'pic_100']
+train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
 #dataset = "origin/"
 dataset = "origin-small/"
 
@@ -125,7 +125,7 @@ def main(frame_path, dataset_name):
     
     img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
         
-    features_white, answers_white = make_feature(boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_H=img_H, img_yolo_b=img_yolo_b, filename=filename)
+    features_white, answers_white = make_feature(boxes=boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_S=img_S, img_yolo_b=img_yolo_b, filename=filename)
         
     features = features_white
     answers = answers_white
@@ -134,7 +134,7 @@ def main(frame_path, dataset_name):
             img, img_hsv, img_H, img_S, img_V, img_gray*255.0, 
             img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0, img_nakagami_norm_th_clip*255.0,
             img_white_filted, img_white_mor*255.0, img_white_contour, 
-             img_white_edgeboxes, img_roi_combine
+            img_white_edgeboxes, img_roi_combine
     ]
     
     for i in range(len(names)):

@@ -3,7 +3,7 @@ import numpy as np
 from utils.color_filter import binary_color_filter
 
 
-def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, filename, version=None):
+def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, filename, version=None):
     answer_color = [
                     [255,0,0],[0,255,0],   #0 1 
                     [0,255,255],[255,0,255], # 2 3
@@ -20,23 +20,33 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
             tmp = img_ground_filted[y:y+h,x:x+w]
             t ,ct= np.unique(tmp.reshape(-1, tmp.shape[2]), axis=0, return_counts=True)
             
-            ### make answer
             
-            yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
-            area_yolo_and_ground = (yolo_and_ground//255).sum()
-            """
-            cv2.imshow("yolo_and_ground", yolo_and_ground)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
-            """
-
-            ROI_combine= area_yolo_and_ground/(w*h)
-            center_line = img_H[y+h//2, x:x+w]
+            yolo_and_edgebox = img_yolo_b[y:y+h,x:x+w]
+            #cv2.imshow("img_yolo_b", yolo_and_edgebox)
+            #cv2.waitKey(0)
+            #cv2.destroyAllWindows()
+            ### make feature
+            area_yolo_and_edgebox = (yolo_and_edgebox//255).sum()
+            
+            ROI_combine= area_yolo_and_edgebox/(w*h)
+            center_line = img_S[y+h//2, x:x+w]
             ROI_center_std = np.std(center_line)
             ROI_center_min = np.amin(center_line)
             ROI_center_area = w*h
             ROI_height = y
             feature = [filename,ROI_combine,ROI_center_min,ROI_center_std,ROI_height,ROI_center_area, [x,y,w,h]]
+            
+            if ROI_combine==0:
+                continue
+            ### make answer
+            
+            yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
+            area_yolo_and_ground = (yolo_and_ground//255).sum()
+            
+            
+            
+
+            
             
             ### make answer
             if state=='train':
@@ -64,12 +74,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                     max_idx = l_ct.index(max(l_ct))
                     max_color = l_t[max_idx]
                     answer = answer_color.index(max_color)
-                    
-                    #if black_area/l_ct[max_idx] > 10:
-                    #    answer=-1
-                    
-                    
-    
+            
                     if answer in [0,1]:
                         answer = 0
                     elif answer in [2,3]:
@@ -81,24 +86,18 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_H,img_yolo_b, fi
                         answer = 1
                     else:
                         answer=0
-
-                    """
-                    #print('label:',answer,black_area, l_ct[max_idx])
-                    print('answer',answer)
-                    cv2.imshow("tmp", tmp)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
-                    """
-                      
-                    
-                    
-                    
                     #print(max_color)
                 #print('answer:',answer)
 
                 
 
-            
+            """
+            #print('label:',answer,black_area, l_ct[max_idx])
+            print('iou:',ROI_combine,'answer:',answer)
+            cv2.imshow("tmp", tmp)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+            """
             features.append(feature)
             answers.append(answer)
             #print(feature,answer)

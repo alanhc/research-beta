@@ -17,11 +17,12 @@ from utils.connect_compoent import ccl, find_BoundingBox
 
 from utils.train_model import *
 
-#train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
-train_dataset = ['dataset_100', 'pic_100']
+train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
+#train_dataset = ['dataset_100', 'pic_100']
+#train_dataset = ['fewer_light_100']
 
-#dataset = "origin/"
 dataset = "origin/"
+#dataset = "origin-small/"
 
 
 def make_training_data(base, frame_path, dataset_name):
@@ -57,10 +58,13 @@ def make_training_data(base, frame_path, dataset_name):
         h = b[3] - b[1]
         
         ### make feature
-        yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
-        area_yolo_and_ground = (yolo_and_ground//255).sum()
-        ROI_combine= area_yolo_and_ground/(w*h)
-        center_line = img_H[y+h//2, x:x+w]
+        
+        
+        yolo_and_edgebox = img_yolo_b[y:y+h,x:x+w]
+        area_yolo_and_edgebox = (yolo_and_edgebox//255).sum()
+
+        ROI_combine = area_yolo_and_edgebox/(w*h)
+        center_line = img_S[y+h//2, x:x+w]
         ROI_center_std = np.std(center_line)
         ROI_center_min = np.amin(center_line)
         ROI_center_area = w*h
@@ -71,6 +75,10 @@ def make_training_data(base, frame_path, dataset_name):
 
         #print(feature)
         ### make answer
+
+        yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
+        area_yolo_and_ground = (yolo_and_ground//255).sum()
+
         img_ROI = img_ground[y:y+h,x:x+w]
         t ,ct= np.unique(img_ROI.reshape(-1, img_ROI.shape[2]), axis=0, return_counts=True)
         #print(t,ct)
@@ -83,6 +91,15 @@ def make_training_data(base, frame_path, dataset_name):
                 answer=0
             else:
                 answer=1
+        
+        """
+        print("iou:", ROI_combine, "answer:", answer)
+        #cv2.imshow("img_ground", img_ground)
+        cv2.imshow("img_ROI", img_ROI)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        """
+        
         features.append(feature)
         answers.append(answer)
     
@@ -90,12 +107,9 @@ def make_training_data(base, frame_path, dataset_name):
             
             
             
-        """
-        cv2.imshow("img_ground", img_ground)
-        cv2.imshow("img_ROI", img_ROI)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        """
+        
+        
+        
         
 
     #print(boxes)
@@ -171,6 +185,6 @@ if __name__ == '__main__':
         print("=====Training models=====")
         save_path = base+dataset+'data-7-train-'+dataset.split('/')[0]
         rf(X_train=X_train, y_train=y_train, save_path=save_path+'-model-rf.pkl' )
-        #svm(X_train=X_train, y_train=y_train, save_path=save_path+'-model-svm.pkl' )
+        svm(X_train=X_train, y_train=y_train, save_path=save_path+'-model-svm.pkl' )
          
        

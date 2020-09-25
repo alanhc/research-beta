@@ -6,8 +6,8 @@ from utils.files import getBaseName, createFolder
 import cv2
 import numpy as np
 import json
-#train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
-train_dataset = ['dataset_100', 'pic_100']
+train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
+#train_dataset = ['dataset_100', 'pic_100']
 
 #dataset = "origin/"
 dataset = "origin-small/"
@@ -19,7 +19,7 @@ yolo_path = '/home/alanhc-school/yolo/darkflow/'
 
 for model_dataset in train_dataset:
     for test_dataset in train_dataset:
-        if model_dataset != test_dataset:
+        if model_dataset == test_dataset:
             
             ### evaluation perfomance
             model_base = '../../dataset/'+model_dataset+'/'

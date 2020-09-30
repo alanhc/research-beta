@@ -3,7 +3,8 @@ import numpy as np
 from utils.color_filter import binary_color_filter
 
 
-def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, filename, version=None):
+def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, filename, version=None, img=None, boxI=None ):
+    
     answer_color = [
                     [255,0,0],[0,255,0],   #0 1 
                     [0,255,255],[255,0,255], # 2 3
@@ -13,6 +14,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
     answers=[]
     if len(boxes) > 0:
         boxes_scores = zip(boxes)
+        
         for b_s in boxes_scores:
             box = b_s[0]
             x, y, w, h = box
@@ -81,11 +83,35 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
                         answer = 1
                     else:
                         answer = -1
+                
                 if version=='v6':
                     if answer in [0,1,2,3]:
-                        answer = 1
+                        answer = 1 
                     else:
                         answer=0
+                elif version=='v7-hand':
+                    
+                    img_show = np.copy(img)
+                    #img_show[y:y+h,x:x+w] = [0,0,255]
+                    img_show = cv2.rectangle(img_show, (x, y), (x+w, y+h), [0,0,255], 3,cv2.LINE_AA)
+                    print("boxI:",boxI,'[',x,y,w,h,']')
+                    
+                    cv2.imshow("img_show-"+str(boxI), img_show)
+                    key = cv2.waitKey(0)
+                    if key==32:
+                        answer=0
+                    else:
+                        answer=1
+                    print(answer)
+                    #if boxI>1335:
+                    #    key = cv2.waitKey(0)
+                    
+                    cv2.destroyAllWindows()
+                
+                if boxI!=None:
+                    boxI+=1
+                    
+                    
                     #print(max_color)
                 #print('answer:',answer)
 
@@ -106,8 +132,10 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             """
-            
-    return features, answers
+    if boxI!=None:
+        return features, answers, boxI
+    else:
+        return features, answers
 
 """
     cv2.imshow("img_red_contour_cliped", img_red_contour_cliped)

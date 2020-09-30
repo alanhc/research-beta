@@ -15,8 +15,8 @@ from utils.fusion import make_feature
 from utils.connect_compoent import *
 from utils.symbolic import symbolic_image
 
-#train_dataset = ['fewer_light_100']
-train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
+train_dataset = ['fewer_light_100', 'pic_100']
+#train_dataset = ['dataset_100', 'pic_100', 'fewer_light_100']
 dataset = "origin/"
 #dataset = "origin-small/"
 
@@ -28,7 +28,7 @@ names = [
             'img', 'img_basic_hsv', 'img_basic_H', 'img_basic_S', 'img_basic_V', 'img_basic_gray', 
             'img_light_detection_gray_th', 'img_light_detection_nakagami_norm', 'img_light_detection_nakagami_norm_th','img_light_detection_nakagami_norm_th_clip',
 
-            'img_color_white_filted', 'img_color_white_mor', 'img_color_white_binary','img_color_white_contour', 
+            'img_color_white_filted', 'img_color_white_mor', 'img_color_white_contour', 
              'img_result_white_edgeboxes', 'img_result_roi_combine'
         ]
 
@@ -39,7 +39,7 @@ for dataset_name in train_dataset:
     for i in range(len(names)):
             createFolder('img/out/'+dataset_name+'/'+names[i])
 
-def main(frame_path, dataset_name):
+def main(frame_path, dataset_name, boxI=None):
     
     print(frame_path)
     filename, f_type = getBaseName(frame_path)
@@ -89,7 +89,7 @@ def main(frame_path, dataset_name):
     
     
     
-    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 0.9, 1, cv2.THRESH_TOZERO)
+    ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 200/255, 1, cv2.THRESH_TOZERO)
     
 
    
@@ -99,7 +99,6 @@ def main(frame_path, dataset_name):
     img_nakagami_norm_th_clip = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     
     img_white_filted = img_nakagami_norm_th_clip*255.0
-    ret, img_white_filted = cv2.threshold(img_white_filted, 255*0.1, 255, cv2.THRESH_TOZERO)
     #ret , img_white_filted = cv2.threshold(img_nakagami_norm_th_clip, 245/255.0, 1, cv2.THRESH_TOZERO)
     #img_white_filted = img_white_filted*255.0
     
@@ -126,7 +125,7 @@ def main(frame_path, dataset_name):
     
     img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
         
-    features_white, answers_white = make_feature(boxes=boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_S=img_S, img_yolo_b=img_yolo_b, filename=filename)
+    features_white, answers_white, bI = make_feature(boxes=boxes_white, version='v7-hand',img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_S=img_S, img_yolo_b=img_yolo_b, filename=filename, img=img, boxI=boxI)
         
     features = features_white
     answers = answers_white
@@ -134,7 +133,7 @@ def main(frame_path, dataset_name):
     imgs =  [
             img, img_hsv, img_H, img_S, img_V, img_gray*255.0, 
             img_gray_th*255.0, img_nakagami_norm*255.0, img_nakagami_norm_th*255.0, img_nakagami_norm_th_clip*255.0,
-            img_white_filted, img_white_mor*255.0, img_white_b, img_white_contour, 
+            img_white_filted, img_white_mor*255.0, img_white_contour, 
             img_white_edgeboxes, img_roi_combine
     ]
     
@@ -166,7 +165,7 @@ def main(frame_path, dataset_name):
     
 
     
-    return features, answers
+    return features, answers, bI
 
         
 
@@ -185,11 +184,12 @@ if __name__ == '__main__':
         features=[]
         answers=[]
         i=1
+        boxI=0
         for f_name in sorted(files):
             tStart = time.time()
-            f, a = main(f_name, dataset_name)
+            f, a, bI = main(f_name, dataset_name, boxI)
             tEnd = time.time()
-
+            boxI=bI
             print("It cost %f sec"% (tEnd - tStart))
             print("remain:",(len(files)-i)*(tEnd - tStart), "sec")
             features = features + f

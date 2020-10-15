@@ -18,9 +18,11 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
         for b_s in boxes_scores:
             box = b_s[0]
             x, y, w, h = box
-            img_ground_filted = cv2.bitwise_or(img_ground, img_ground, mask=img_ground_mask)
-            tmp = img_ground_filted[y:y+h,x:x+w]
-            t ,ct= np.unique(tmp.reshape(-1, tmp.shape[2]), axis=0, return_counts=True)
+            
+            if state=='train':
+                img_ground_filted = cv2.bitwise_or(img_ground, img_ground, mask=img_ground_mask)
+                tmp = img_ground_filted[y:y+h,x:x+w]
+                t ,ct= np.unique(tmp.reshape(-1, tmp.shape[2]), axis=0, return_counts=True)
             
             
             yolo_and_edgebox = img_yolo_b[y:y+h,x:x+w]
@@ -37,14 +39,15 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             ROI_center_area = w*h
             ROI_height = y
             feature = [filename,ROI_combine,ROI_center_min,ROI_center_std,ROI_height,ROI_center_area, [x,y,w,h]]
-            
+            features.append(feature)
             if ROI_combine==0:
                 continue
+            
             ### make answer
-            
-            yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
-            area_yolo_and_ground = (yolo_and_ground//255).sum()
-            
+            if state=='train':
+                yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
+                area_yolo_and_ground = (yolo_and_ground//255).sum()
+                
             
             
 
@@ -124,14 +127,23 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             """
-            features.append(feature)
-            answers.append(answer)
-            #print(feature,answer)
+            
+            if state=='train':
+                features.append(feature)
+                answers.append(answer)
+                print(feature,answer)
             """
             cv2.imshow("tmp", tmp)
             cv2.waitKey(0)
             cv2.destroyAllWindows()
             """
+    
+    if state=='test':
+        if boxI!=None:
+            return features, boxI
+        else:
+            return features
+    
     if boxI!=None:
         return features, answers, boxI
     else:

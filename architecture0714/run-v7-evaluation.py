@@ -87,7 +87,7 @@ for model_dataset in train_dataset:
                 print(data.shape)
                 print(data.head(3))
                 print(g.count().index)
-
+                result_data = []
                 for filename in g.count().index:
                     filename = int(filename)
                     img = cv2.imread(test_base+dataset+str(filename)+'.bmp', 1)
@@ -124,6 +124,7 @@ for model_dataset in train_dataset:
                     yolo_mask.fill(255.0)
                     combine_mask.fill(255.0)
                     
+                    
                     for d in data:
                         
                         x = d['topleft']['x']
@@ -138,14 +139,9 @@ for model_dataset in train_dataset:
                         region_yolo_light = light_mask[y:y+h,x:x+w]
                         
                         if [0,0,0] in region_yolo_light: # have light region
+                            result_data.append([str(filename), [x,y,w,h]])
                             combine_mask[y:y+h,x:x+w] = [0,0,0]
                             img_combine_rect = cv2.rectangle(img_combine_rect, (x, y), (x+w, y+h), [0,255,0], 3,cv2.LINE_AA)
-                        
-                        
-                        
-                        
-                    
-                    
                     
                     img = img.astype('uint8')
                     img_yolo = img_yolo.astype('uint8')
@@ -166,6 +162,10 @@ for model_dataset in train_dataset:
                     cv2.imwrite(save_path+'combine_rect/'+str(filename)+".png", img_combine_rect)
                     cv2.imwrite(save_path+'yolo_rect/'+str(filename)+".png", img_yolo_rect)
                     cv2.imwrite(save_path+'light_rect/'+str(filename)+".png", img_light_rect)
+
+                save_data =  pd.DataFrame(result_data, columns=['filename', 'position'])
+                
+                save_data.to_csv(test_dataset+'_result.csv')     
 
 
 

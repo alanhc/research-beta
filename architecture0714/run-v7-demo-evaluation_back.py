@@ -7,20 +7,6 @@ import cv2
 import numpy as np
 import json
 
-def rect_cross(boxes):
-    if boxes[0][2]>boxes[1][0] or boxes[0][3]<boxes[1][1]:
-        return True
-    else:
-        return False
-
-def mid_pos(boxes):
-    pos =[]
-    for i in range(4):
-        pos.append( (boxes[0][i]+boxes[1][i])//2 )
-    pos[2] = pos[2] - pos[0]
-    pos[3] = pos[3] - pos[1]
-    return pos
-
 createFolder('img/demo-out/3/img_result_light_mask')
 names = ['yolo', 'yolo_rect', 'light', 'light_rect', 'combine', 'combine_rect']
 for i in range(len(names)):
@@ -59,7 +45,6 @@ print(g.count().index)
 
 img_path = '/home/alanhc-school/Downloads/research/research-beta/architecture0714/img/demo-out/3/img/'
 img_yolo_path = '/home/alanhc-school/yolo/darkflow/tlchia-dataset-v2_day/'
-result_data = []
 for filename in g.count().index:
     img = cv2.imread(img_path+str(filename)+'.png', 1)
     img_yolo = cv2.imread(img_yolo_path+str(filename)+'.jpg', 1)
@@ -88,8 +73,6 @@ for filename in g.count().index:
         data = data.replace("'", '"')
         data = json.loads(data)
 
-    
-
 
     # Vehicle Detection
     
@@ -97,7 +80,6 @@ for filename in g.count().index:
     combine_mask = np.zeros((img_h,img_w,img_c))
     yolo_mask.fill(255.0)
     combine_mask.fill(255.0)
-    
     for d in data:
         x = d['topleft']['x']
         y = d['topleft']['y']
@@ -110,7 +92,6 @@ for filename in g.count().index:
         region_yolo_light = light_mask[y:y+h,x:x+w]
                         
         if [0,0,0] in region_yolo_light: # have light region
-            result_data.append([str(filename), [x,y,w,h]])
             combine_mask[y:y+h,x:x+w] = [0,0,0]
             img_combine_rect = cv2.rectangle(img_combine_rect, (x, y), (x+w, y+h), [0,255,0], 3,cv2.LINE_AA)
             
@@ -131,48 +112,10 @@ for filename in g.count().index:
                     
         save_path = 'img/demo-out/3/img_result_light_mask/'
         print(save_path+str(filename)+".png")
-        
-        #cv2.imwrite(save_path+'combine/'+str(filename)+".png", img_result_combine)
+        cv2.imwrite(save_path+'combine/'+str(filename)+".png", img_result_combine)
         cv2.imwrite(save_path+'yolo/'+str(filename)+".png", img_result_yolo)
         cv2.imwrite(save_path+'light/'+str(filename)+".png", img_result_light)
-        #cv2.imwrite(save_path+'combine_rect/'+str(filename)+".png", img_combine_rect)
+        cv2.imwrite(save_path+'combine_rect/'+str(filename)+".png", img_combine_rect)
         cv2.imwrite(save_path+'yolo_rect/'+str(filename)+".png", img_yolo_rect)
         cv2.imwrite(save_path+'light_rect/'+str(filename)+".png", img_light_rect)
-        
-
-save_data =  pd.DataFrame(result_data, columns=['filename', 'position'])
-save_data.to_csv('demo-result-before.csv')  
-data = save_data
-
-# smooth the data
-roi_names = g.count().index
-for i in range(len(roi_names)-1):
-    #print("==", data['filename']==int(roi_names[i]) )
-    #print("===", data)
-    frame_data_old = data[ data['filename']==int(roi_names[i]) ]
-    frame_data_now = data[ data['filename']==roi_names[i+1] ]
-    for old_data in frame_data_old.head().iterrows():
-        for now_data in frame_data_now.head().iterrows():
-            filename = now_data[1]['filename']
-            o_data = json.loads(str(old_data[1]['position']))
-            n_data = json.loads(str(now_data[1]['position']))
-            r1_x1, r1_y1, r1_w, r1_h = o_data
-            r1_x2 = r1_x1 + r1_w
-            r1_y2 = r1_y1 + r1_h
-            r2_x1, r2_y1, r2_w, r2_h = n_data
-            r2_x2 = r2_x1 + r2_w
-            r2_y2 = r2_y1 + r2_h
-            boxes = []
-            boxes.append([r1_x1,r1_y1, r1_x2, r1_y2])
-            boxes.append([r2_x1,r2_y1, r2_x2, r2_y2])
-            boxes.sort()
-            is_cross = rect_cross(boxes)
-            if is_cross:
-                x,y,w,h = mid_pos(boxes)
-                name_check = data['filename']==filename
-                pos_check = data['position'] == str(n_data)
-                data.loc[pos_check,'position'] =  str([x,y,w,h])
-save_data =  pd.DataFrame(result_data, columns=['filename', 'position'])
-save_data.to_csv('demo-result-after.csv')  
-
-    
+                        

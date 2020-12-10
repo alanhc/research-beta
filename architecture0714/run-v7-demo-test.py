@@ -73,7 +73,7 @@ def main(frame_name):
     img_nakagami_norm_th_clip = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     
     img_white_filted = img_nakagami_norm_th_clip*255.0
-    ret, img_white_filted = cv2.threshold(img_white_filted, 230, 255, cv2.THRESH_TOZERO)
+    #ret, img_white_filted = cv2.threshold(img_white_filted, 200, 255, cv2.THRESH_TOZERO)
     #ret , img_white_filted = cv2.threshold(img_nakagami_norm_th_clip, 245/255.0, 1, cv2.THRESH_TOZERO)
     #img_white_filted = img_white_filted*255.0
     

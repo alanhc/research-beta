@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import time
 import math
+import os
 ########## Method import ##########
 from utils.files import getBaseName, createFolder
 from utils.color_filter import Euclidean_filter, binary_color_filter
@@ -90,6 +91,7 @@ def main(frame_path, dataset_name):
     
     
     ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, 200/255, 1, cv2.THRESH_TOZERO)
+    #ret, img_nakagami_norm_th = cv2.threshold(img_nakagami_norm, .95, 1, cv2.THRESH_TOZERO)
     
 
    
@@ -99,7 +101,10 @@ def main(frame_path, dataset_name):
     img_nakagami_norm_th_clip = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     
     img_white_filted = img_nakagami_norm_th_clip*255.0
-    ret, img_white_filted = cv2.threshold(img_white_filted, 230, 255, cv2.THRESH_TOZERO)
+    #ret, img_white_filted = cv2.threshold(img_white_filted, 230, 255, cv2.THRESH_TOZERO) oigin
+    
+    #ret, img_white_filted = cv2.threshold(img_white_filted, 230, 255, cv2.THRESH_TOZERO) 
+    
     #ret , img_white_filted = cv2.threshold(img_nakagami_norm_th_clip, 245/255.0, 1, cv2.THRESH_TOZERO)
     #img_white_filted = img_white_filted*255.0
     
@@ -108,7 +113,7 @@ def main(frame_path, dataset_name):
     img_white_mor = cv2.morphologyEx(img_white_filted,cv2.MORPH_CLOSE, k,iterations=3) / 255.0
     
 
-    ret, img_white_b = cv2.threshold(img_white_mor, 0.9, 255, cv2.THRESH_BINARY)
+    ret, img_white_b = cv2.threshold(img_white_mor, 0.8, 255, cv2.THRESH_BINARY)
     
     ### Contour
     
@@ -126,7 +131,7 @@ def main(frame_path, dataset_name):
     
     img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
         
-    features_white, answers_white = make_feature(boxes=boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state=state, img_S=img_S, img_yolo_b=img_yolo_b, filename=filename)
+    features_white, answers_white = make_feature(boxes=boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state='train', img_S=img_S, img_yolo_b=img_yolo_b, filename=filename)
         
     features = features_white
     answers = answers_white
@@ -164,8 +169,8 @@ def main(frame_path, dataset_name):
     
     
     
-
     
+    #print("===", len(answers), len(features))
     return features, answers
 
         
@@ -194,9 +199,11 @@ if __name__ == '__main__':
             print("remain:",(len(files)-i)*(tEnd - tStart), "sec")
             features = features + f
             answers = answers + a
+            
             i+=1
-
+      
         data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
+        #data = data[['fliename','iou', 'min', 'std', 'position']]
         data['answers'] = pd.DataFrame(answers)
         data.to_csv(base+dataset+'data-7-test-'+dataset.split('/')[0]+'.csv')
         

@@ -7,19 +7,6 @@ import cv2
 import numpy as np
 import json
 
-def rect_cross(boxes):
-    if boxes[0][2]>boxes[1][0] or boxes[0][3]<boxes[1][1]:
-        return True
-    else:
-        return False
-
-def mid_pos(boxes):
-    pos =[]
-    for i in range(4):
-        pos.append( (boxes[0][i]+boxes[1][i])//2 )
-    pos[2] = pos[2] - pos[0]
-    pos[3] = pos[3] - pos[1]
-    return pos
 
 createFolder('img/demo-out/3/img_result_light_mask')
 names = ['yolo', 'yolo_rect', 'light', 'light_rect', 'combine', 'combine_rect']
@@ -143,36 +130,3 @@ for filename in g.count().index:
 save_data =  pd.DataFrame(result_data, columns=['filename', 'position'])
 save_data.to_csv('demo-result-before.csv')  
 data = save_data
-
-# smooth the data
-roi_names = g.count().index
-for i in range(len(roi_names)-1):
-    #print("==", data['filename']==int(roi_names[i]) )
-    #print("===", data)
-    frame_data_old = data[ data['filename']==int(roi_names[i]) ]
-    frame_data_now = data[ data['filename']==roi_names[i+1] ]
-    for old_data in frame_data_old.head().iterrows():
-        for now_data in frame_data_now.head().iterrows():
-            filename = now_data[1]['filename']
-            o_data = json.loads(str(old_data[1]['position']))
-            n_data = json.loads(str(now_data[1]['position']))
-            r1_x1, r1_y1, r1_w, r1_h = o_data
-            r1_x2 = r1_x1 + r1_w
-            r1_y2 = r1_y1 + r1_h
-            r2_x1, r2_y1, r2_w, r2_h = n_data
-            r2_x2 = r2_x1 + r2_w
-            r2_y2 = r2_y1 + r2_h
-            boxes = []
-            boxes.append([r1_x1,r1_y1, r1_x2, r1_y2])
-            boxes.append([r2_x1,r2_y1, r2_x2, r2_y2])
-            boxes.sort()
-            is_cross = rect_cross(boxes)
-            if is_cross:
-                x,y,w,h = mid_pos(boxes)
-                name_check = data['filename']==filename
-                pos_check = data['position'] == str(n_data)
-                data.loc[pos_check,'position'] =  str([x,y,w,h])
-save_data =  pd.DataFrame(result_data, columns=['filename', 'position'])
-save_data.to_csv('demo-result-after.csv')  
-
-    

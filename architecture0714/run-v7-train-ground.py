@@ -84,13 +84,27 @@ def make_training_data(base, frame_path, dataset_name):
         #print(t,ct)
         
         answer = ""
-        if len(t)==1:
-            t = t.tolist()
-            
-            if t[0] in [[0,0,255], [0,0,0]]:
+        #if len(t)==1:
+        t = t.tolist()
+        idx, = np.where(ct == ct.max()) 
+        if t[int(idx)] in [[0,0,255], [0,0,0]]:
+            answer=0
+        else:
+            answer=1
+        
+        
+        
+        
+        
+        if answer not in [0,1]:
+            if t in [[0,0,255], [0,0,0]]:
                 answer=0
             else:
                 answer=1
+
+            cv2.imshow("img_ROI", img_ROI)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
         
         """
         print("iou:", ROI_combine, "answer:", answer)
@@ -147,6 +161,7 @@ if __name__ == '__main__':
         
         data = pd.DataFrame(features, columns=['fliename','iou', 'min', 'std', 'y', 'area', 'position'])
         data['answers'] = pd.DataFrame(answers)
+        print("==========", base+dataset+'data-7-train-'+dataset.split('/')[0]+'.csv')
         data.to_csv(base+dataset+'data-7-train-'+dataset.split('/')[0]+'.csv')
         
         #training
@@ -178,6 +193,7 @@ if __name__ == '__main__':
 
         data = df_test_over
         X_train = data[['iou', 'min', 'std', 'y', 'area']]
+        #X_train = data[['iou', 'min', 'std']]
         y_train = data['answers']
         print("X_train:",X_train.shape, "X_train:", y_train.shape)
         

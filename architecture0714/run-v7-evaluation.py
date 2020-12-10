@@ -27,11 +27,14 @@ for model_dataset in train_dataset:
             
             test_path = test_base+dataset+'data-7-test-'+dataset.split('/')[0]
             
-            
+            print(test_base+dataset+'data-7-test-'+dataset.split('/')[0]+'.csv')
             test_data = pd.read_csv(test_base+dataset+'data-7-test-'+dataset.split('/')[0]+'.csv')
-
+           
             print(test_data.shape)
-            X_test = test_data[['iou', 'min', 'std', 'y', 'area']]
+            #X_test = test_data[['iou', 'min', 'std', 'y', 'area']]
+            X_test = test_data[['iou', 'min', 'std']]
+            
+
             y_test = test_data['answers']
             y_pred = []
 
@@ -42,6 +45,8 @@ for model_dataset in train_dataset:
 
                 print(model[1])
                 y_pred = model.predict(X_test)
+                print(y_test.shape)
+                print(type(y_pred), type(y_test))
 
                 print(confusion_matrix(y_pred,y_test))
                 print(classification_report(y_pred, y_test))
@@ -70,7 +75,7 @@ for model_dataset in train_dataset:
                 data = pd.read_csv(test_path+'.csv')
                 
                 test_data = pd.read_csv(test_path+'-'+model_name+'-predict.csv')
-
+                print(test_path+'-'+model_name+'-predict.csv')
                 print(data.shape)
                 print(test_data.shape)
                 

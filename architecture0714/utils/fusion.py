@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from utils.color_filter import binary_color_filter
-
+import pandas as pd
 
 def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, filename, version=None, img=None, boxI=None ):
     
@@ -39,7 +39,9 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             ROI_center_area = w*h
             ROI_height = y
             feature = [filename,ROI_combine,ROI_center_min,ROI_center_std,ROI_height,ROI_center_area, [x,y,w,h]]
-            features.append(feature)
+            
+            if state=='test':
+                features.append(feature)
             if ROI_combine==0:
                 continue
             
@@ -47,14 +49,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             if state=='train':
                 yolo_and_ground = np.bitwise_and(img_ground_mask[y:y+h,x:x+w] ,img_yolo_b[y:y+h,x:x+w])
                 area_yolo_and_ground = (yolo_and_ground//255).sum()
-                
-            
-            
 
-            
-            
-            ### make answer
-            if state=='train':
                 answer=""
                 l_t = t.tolist()
                 l_ct = ct.tolist()
@@ -99,7 +94,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
                     img_show = cv2.rectangle(img_show, (x, y), (x+w, y+h), [0,0,255], 3,cv2.LINE_AA)
                     print("boxI:",boxI,'[',x,y,w,h,']')
                     
-                    cv2.imshow("img_show-"+str(boxI), img_show)
+                    
                     key = cv2.waitKey(0)
                     if key==32:
                         answer=0
@@ -109,7 +104,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
                     #if boxI>1335:
                     #    key = cv2.waitKey(0)
                     
-                    cv2.destroyAllWindows()
+                    
                 
                 if boxI!=None:
                     boxI+=1
@@ -131,7 +126,7 @@ def make_feature(boxes, img_ground, img_ground_mask, state, img_S,img_yolo_b, fi
             if state=='train':
                 features.append(feature)
                 answers.append(answer)
-                print(feature,answer)
+                #print(len(features))
             """
             cv2.imshow("tmp", tmp)
             cv2.waitKey(0)

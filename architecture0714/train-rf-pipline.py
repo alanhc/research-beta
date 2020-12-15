@@ -12,15 +12,15 @@ import numpy as np
 
 dataset = "origin/"
 
-train_dataset = ['dataset_100', 'pic_100']
-
+#train_dataset = ['dataset_100', 'pic_100']
+train_dataset = ['pic_100', 'dataset_100']
 
 
 for dataset_name in train_dataset:
     base = '../../dataset/'+dataset_name+'/'
-    save_path = base+dataset+'model-rf-v3.pkl'
+    save_path = base+dataset+'model-rf-v6.pkl'
 
-    all_data = pd.read_csv(base+dataset+'data-2.csv')
+    all_data = pd.read_csv(base+dataset+'data-6.csv')
     print('all_data:',all_data.shape)
 
     all_count = all_data.answers.value_counts().sort_index()
@@ -91,13 +91,13 @@ for dataset_name in train_dataset:
     pipeline = Pipeline(steps) 
 
     parameteres3 = {
-        'rf__n_estimators': [50,100,200,500],
+        'rf__n_estimators': [50,100,200],
         'rf__max_features': ['auto', 'sqrt', 'log2'],
-        'rf__max_depth' : [4,8,10,20],
+        'rf__max_depth' : [4,8],
         'rf__criterion' :['gini', 'entropy']
     }
     #print(parameteres3)
-    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5,scoring='f1_micro', n_jobs=-1)
+    rf_random = GridSearchCV(pipeline, param_grid=parameteres3,cv=5, n_jobs=-1)
 
 
     rf_random.fit(X_train, y_train)

@@ -3,17 +3,21 @@ import cv2
 import matplotlib.pyplot as plt
 from utils.files import getBaseName, createFolder
 state=''
-save =False
-def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_spilt, save_path):
+save = False
+def Euclidean_filter(img=None, percent=None,up_threshold=None,lower_threshold=None,  color=None, img_BGR_spilt=None, save_path=None, threshold=None):
     
     filename = save_path.split('/')[-2]
     print(filename)
+    if save_path!=None:
+        save=True
+    
     if color==[255,255,255]:
         state='white'
-    elif color==[255,0,0]:
+    elif color==[255,50,150]:
         state='red'
     
     h, w, c = img.shape
+    
     r1 = np.full((h, w),color[0])
     g1 = np.full((h, w),color[1])
     b1 = np.full((h, w),color[2])
@@ -27,11 +31,12 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     #adaptive_gaus = cv2.adaptiveThreshold(img_d, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 7,3)
     
     #t2, otsu = cv2.threshold(img_d, 0, 255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    if threshold==None:
+        if state == 'red':
+            threshold=150
+        elif state == 'white':
+            threshold=15
     
-    if state == 'red':
-        threshold=150
-    elif state == 'white':
-        threshold=15
     
     
     
@@ -43,7 +48,9 @@ def Euclidean_filter(img, percent,up_threshold,lower_threshold,  color, img_BGR_
     img_filted[idx] = 0
 
     if save:
+        img_d = img_d.max() - img_d
         cv2.imwrite(save_path+'_'+state+'_img_distance_norm.png', img_d)
+        return img_filted, idx, img_d
         
        
     return img_filted, idx

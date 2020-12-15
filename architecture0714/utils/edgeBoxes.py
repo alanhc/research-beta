@@ -8,7 +8,7 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine, state, filename, bas
     
     img_origin = np.copy(img_origin)
     img_gray = np.copy(img_gray)
-    
+    img_roi_combine = np.copy(img_roi_combine)
 
     edge_detection = cv2.ximgproc.createStructuredEdgeDetection(model)
 
@@ -21,7 +21,7 @@ def Edgeboxes(img_gray, img_origin, color, img_roi_combine, state, filename, bas
     orimap = edge_detection.computeOrientation(edges)
     edges = edge_detection.edgesNms(edges, orimap)
     
-    edge_boxes = cv2.ximgproc.createEdgeBoxes(minBoxArea=windows, maxBoxes=100)
+    edge_boxes = cv2.ximgproc.createEdgeBoxes(minBoxArea=100, maxBoxes=100)
    
     
     boxes = edge_boxes.getBoundingBoxes(edges, orimap)

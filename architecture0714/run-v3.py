@@ -10,7 +10,7 @@ from utils.color_filter import Euclidean_filter
 from utils.symbolic import symbolic_image
 from utils.connect_compoent import ccl, find_BoundingBox
 
-base = '../../dataset/fewer_light_100/'
+base = '../../dataset/dataset_100/'
 
 save = True
 

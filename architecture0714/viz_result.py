@@ -23,8 +23,8 @@ if os.path.isdir(base+'result_out'):
 createFolder(base+'result_out')
 
 
-data = pd.read_csv(base+dataset+'data-2.csv')
-test_data = pd.read_csv(base+dataset+'data-2-test.csv')
+data = pd.read_csv(base+dataset+'data-5.csv')
+test_data = pd.read_csv(base+dataset+'data-5-test.csv')
 
 print('report:')
 y_test = data['answers']

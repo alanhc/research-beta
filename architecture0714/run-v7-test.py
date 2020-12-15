@@ -41,7 +41,7 @@ for dataset_name in train_dataset:
             createFolder('img/out/'+dataset_name+'/'+names[i])
 
 def main(frame_path, dataset_name):
-    
+    times = []
     print(frame_path)
     filename, f_type = getBaseName(frame_path)
     
@@ -62,26 +62,42 @@ def main(frame_path, dataset_name):
     img_S = img_hsv[:,:,1]
     img_V = img_hsv[:,:,2]
     
+    #tStart = time.time()
+    #tEnd = time.time()
+    #(tEnd - tStart)
+
     ### Light Detection
+    tStart_gray = time.time()
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) / 255.0
+    
+
     ret , img_gray_th = cv2.threshold(img_gray, 0.4, 1, cv2.THRESH_TOZERO)
-    
-    
+    tEnd_gray = time.time()
+    times.append({"gray_t":(tEnd_gray - tStart_gray)})
+
+
+    #tStart = time.time()
+    #tEnd = time.time()
+    #(tEnd - tStart)
+    tStart_sigmoid = time.time()
     img_sigmoid = img_gray * 255.0
     img_sigmoid = 1 / (1 + np.exp(-(img_gray-128)/20))
-    print(img_sigmoid.min(), img_sigmoid.max())
+    #print(img_sigmoid.min(), img_sigmoid.max())
     d = img_sigmoid.max()- img_sigmoid.min()
     
+
     img_sigmoid = 255*(img_sigmoid-img_sigmoid.min()) / d
     print(img_sigmoid.min(), img_sigmoid.max())
     ret , img_sigmoid_th = cv2.threshold(img_sigmoid, 245, 255, cv2.THRESH_TOZERO)
-    
+    tEnd_sigmoid =  time.time()
+    times.append({"sigmoid_t":(tEnd_sigmoid - tStart_sigmoid)})
+
     createFolder('img/out/'+dataset_name+'/'+"img_test_sigmoid")
     createFolder('img/out/'+dataset_name+'/'+"img_test_sigmoid_th")
     cv2.imwrite('img/out/'+dataset_name+'/'+"img_test_sigmoid"+'/'+filename+'.png', img_sigmoid)
     cv2.imwrite('img/out/'+dataset_name+'/'+"img_test_sigmoid_th"+'/'+filename+'.png', img_sigmoid_th)
 
-
+    tStart_nakagami = time.time()
     if nakagami:
         img_nakagami = Nakagami_image_enhancement(img_gray_th, 3)
     else:
@@ -95,9 +111,10 @@ def main(frame_path, dataset_name):
     
 
    
-    
-
+    tEnd_nakagami =  time.time()
+    times.append({"nakagami_t":(tEnd_nakagami - tStart_nakagami)})
     ### clip center
+
     img_nakagami_norm_th_clip = clip_center(img_nakagami_norm_th, int(h/3), int(h))
     
     img_white_filted = img_nakagami_norm_th_clip*255.0
@@ -108,13 +125,16 @@ def main(frame_path, dataset_name):
     #ret , img_white_filted = cv2.threshold(img_nakagami_norm_th_clip, 245/255.0, 1, cv2.THRESH_TOZERO)
     #img_white_filted = img_white_filted*255.0
     
-
+    tStart_morphology = time.time()
     k=np.ones((3,3), np.uint8)
     img_white_mor = cv2.morphologyEx(img_white_filted,cv2.MORPH_CLOSE, k,iterations=3) / 255.0
     
 
     ret, img_white_b = cv2.threshold(img_white_mor, 0.8, 255, cv2.THRESH_BINARY)
+    tEnd_morphology =  time.time()
+    times.append({"morphology_t":(tEnd_morphology - tStart_morphology)})
     
+    tStart_edgebox= time.time()
     ### Contour
     
     img_white_contour = contour_Detection(img_white_b)
@@ -123,16 +143,19 @@ def main(frame_path, dataset_name):
     img_roi_combine = np.copy(img)
     #img_red_edgeboxes,img_roi_combine, boxes_red = Edgeboxes(img_gray=img_red_contour, img_origin=img, color=[0,255,0], img_roi_combine=img_roi_combine, state=state, filename=filename, base=base) #contour, img_origin, box color(BGR)
     img_white_edgeboxes,img_roi_combine, boxes_white = Edgeboxes(img_gray=img_white_contour, img_origin=img, color=[255,0,0], img_roi_combine=img_roi_combine, state=state, filename=filename, base=base) #contour, img_origin, box color(BGR)
-    
+    tEnd_edgebox =  time.time()
+    times.append({"edgebox_t":(tEnd_edgebox - tStart_edgebox)})
+
     ### Fusion
     ### fusion ###
     img_ground = cv2.imread(base+"ground_truth/"+filename+'.bmp',1).astype('uint8')
     img_ground_mask = binary_color_filter(img_ground).astype('uint8')
     
     img_yolo_b = cv2.imread(base+"yolo_binary/"+filename+'.png',0).astype('uint8')
-        
+    tStart_fusion= time.time()
     features_white, answers_white = make_feature(boxes=boxes_white, version='v6',img_ground=img_ground, img_ground_mask=img_ground_mask, state='train', img_S=img_S, img_yolo_b=img_yolo_b, filename=filename)
-        
+    tEnd_fusion =  time.time()
+    times.append({"fusion_t":(tEnd_fusion - tStart_fusion)})
     features = features_white
     answers = answers_white
 
@@ -169,7 +192,7 @@ def main(frame_path, dataset_name):
     
     
     
-    
+    print("計算每個步驟時間", times)
     #print("===", len(answers), len(features))
     return features, answers
 

@@ -55,8 +55,8 @@ def main(frame_path, dataset_name):
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     img_hsv[:,:,0] = img_hsv[:,:,0] / img_hsv[:,:,0].max() * 255.0
-    img_hsv[:,:,0] = img_hsv[:,:,1] / img_hsv[:,:,1].max() * 255.0
-    img_hsv[:,:,0] = img_hsv[:,:,2] / img_hsv[:,:,2].max() * 255.0
+    img_hsv[:,:,1] = img_hsv[:,:,1] / img_hsv[:,:,1].max() * 255.0
+    img_hsv[:,:,2] = img_hsv[:,:,2] / img_hsv[:,:,2].max() * 255.0
     
     img_H = img_hsv[:,:,0]
     img_S = img_hsv[:,:,1]
